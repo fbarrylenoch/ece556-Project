@@ -1,0 +1,7 @@
+docs/
+html/
+latex/
+*.o
+*.txt
+*.exe
+*.tar
