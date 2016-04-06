@@ -1,5 +1,3 @@
-// ECE556 - Copyright 2014 University of Wisconsin-Madison.  All Rights Reserved.
-
 #include "ece556.h"
 
 void handler(int sig) {
@@ -176,14 +174,16 @@ int solveRouting(routingInst *rst){
             point p1 = tempNet->pins[j];
             point p2 = tempNet->pins[j+1];
             if ((p1.x == p2.x || p1.y == p2.y)) {
-                segment *tempSeg = new segment;
-                tempSeg->p1 = p1;
-                tempSeg->p2 = p2;
-                tempSeg->numEdges = 1;
-                tempSeg->edges = (int *)malloc(4*sizeof(int));
-                tempSeg->edges = {p1.x, p1.y, p2.x, p2.y};
-                tmpNet->nroute.segments[tempNet->nroute.numSegs] = tempSeg;
-                tmpNet->nroute.numSegs++;
+                segment tempSeg = tempNet->nroute.segments[tempNet->nroute.numSegs];
+                tempNet->nroute.numSegs++;
+		tempSeg.p1 = p1;
+                tempSeg.p2 = p2;
+                tempSeg.numEdges = 1;
+                tempSeg.edges = (int *)malloc(4*sizeof(int));
+                tempSeg.edges[0] = p1.x;
+		tempSeg.edges[1] = p1.y;
+		tempSeg.edges[2] = p2.x;
+		tempSeg.edges[3] = p2.y;
             }
             else {
                 point topP;
@@ -197,77 +197,82 @@ int solveRouting(routingInst *rst){
                     bottomP = p1;
                  }
                 // add topP to midPoint
-                segment *tempSeg = new segment;
-                tempSeg->p1 = topP;
+                segment tempSeg = tempNet->nroute.segments[tempNet->nroute.numSegs];
+		tempNet->nroute.numSegs++;
+                tempSeg.p1 = topP;
                 point *midPoint = new point;
                 midPoint->x = topP.x;
                 midPoint->y = bottomP.y;
-                tempSeg->p2 = *midPoint;
-                tempSeg->numEdges = 1;
-                tempSeg->edges = (int *)malloc(4*sizeof(int));
-                tempSeg->edges = {topP.x, topP.y, midPoint->x, midPoint->y};
-                tempNet->nroute.segments[tempNet->nroute.numSegs] = tempSeg;
-                tempNet->nroute.numSegs++;
+                tempSeg.p2 = *midPoint;
+                tempSeg.numEdges = 1;
+                tempSeg.edges = (int *)malloc(4*sizeof(int));
+                tempSeg.edges[0] = topP.x;
+		tempSeg.edges[1] = topP.y;
+		tempSeg.edges[2] = midPoint->x;
+		tempSeg.edges[3] = midPoint->y;
 
                 //add midPoint to bottomP
-                tempSeg = new segment;
-                tempSeg->p1 = *midPoint;
-                tempSeg->p2 = bottomP;
-                tempSeg->numEdges = 1;
-                tempSeg->edges = (int *)malloc(4*sizeof(int));
-                tempSeg->edges[0] = midPoint->x;
-                tempSeg->edges[1] = midPoint->y; 
-                tempSeg->edges[2] = bottomP.x;
-                tempSeg->edges[3] = bottomP.y;
-                tempNet->nroute.segments[tempNet->nroute.numSegs] = tempSeg;
-                tempNet->nroute.numSegs++;
+                tempSeg = tempNet->nroute.segments[tempNet->nroute.numSegs];
+		tempNet->nroute.numSegs++;
+                tempSeg.p1 = *midPoint;
+                tempSeg.p2 = bottomP;
+                tempSeg.numEdges = 1;
+                tempSeg.edges = (int *)malloc(4*sizeof(int));
+                tempSeg.edges[0] = midPoint->x;
+                tempSeg.edges[1] = midPoint->y; 
+                tempSeg.edges[2] = bottomP.x;
+                tempSeg.edges[3] = bottomP.y;
             }
         }
     }
   return 1;
 }
 
-
-bool containsBlockage(routingInst *rst, point *p1, point *p2) {
-    // check if vertical line
-    if (p1->x == p2->x) {
-        if (p1->y < p2->y) {
-            int yCap = p1->y;
-            int horizontalIndexes = (rst->gy)*(rst->gx - 1);
-            int index = horizontalIndexes + yCap + p1->x;
-
-            if (rst->edgeCaps[index] == 0)
-                return true;
-            else 
-                return false;
-        }else {
-            int yCap = p2->y;
-            int horizontalIndexes = (rst->gy)*(rst->gx - 1);
-            int index = horizontalIndexes + yCap + p1->x;
-
-            if (rst->edgeCaps[0] != 0) {return false;}
-            else { return true; }
-        }
-    }
-    
-    // check if horizontal line
-    else if (p1->y == p2->y) {}
-    
-    // must not be a straight line if enter here
-    // remove this if want function to handle bends
-    else { return false; }
-}
-
 int writeOutput(const char *outRouteFile, routingInst *rst){
     /*********** TO BE FILLED BY YOU **********/
+	try {
+                ofstream output;
+                output.open(outRouteFile);
 
+                for (int i = 0; i < rst->numNets; i++) {
+
+                        net tmpNet = rst->nets[i];
+                        route tmpRoute = tmpNet.nroute;
+                        output << "n" + tmpNet.id + "\n";
+
+                        for (int j = 0; j < tmpRoute.numSegs; j++) {
+                                segment tmpSeg = tmpRoute.segments[j];
+                                output << "("+tmpSeg.p1.x+","+tmpSeg.p1.y+")-("+
+                                        tmpSeg.p2.x+","+tmpSeg.p2.y+")\n";
+                        }
+                        output << "!\n";
+                }
+                output.close();
+        } catch(int e) {
+                return 0;
+        }
     return 1;
 }
 
 
 int release(routingInst *rst){
     /*********** TO BE FILLED BY YOU **********/
+	try {
+                for (int i = 0; i < rst->numNets; i++) {
+                        net deleteNet = rst->nets[i];
+                        delete deleteNet.nroute.segments;
+                        delete deleteNet.pins;
+                }
 
+                delete rst->edgeCaps;
+                delete rst->edgeUtils;
+
+                delete rst;
+
+        } catch(int e) {
+                return 0;
+        }
     return 1;
 }
+
 
