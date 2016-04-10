@@ -314,7 +314,7 @@ int* getIndex(point p1, point p2, routingInst rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                
+                index[0] = (rst.gx-1)*p1.y + p1.x + i;
             }
         }            
         else if((p1.x-p2.x) == 1) {
@@ -327,7 +327,7 @@ int* getIndex(point p1, point p2, routingInst rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                
+                index[0] = (rst.gx-1)*p1.y + p2.x + i;
             }
         } // case where p1.x-p2.x > 1
     }
@@ -344,7 +344,7 @@ int* getIndex(point p1, point p2, routingInst rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                
+                index[i] = (rst.gy)*(rst.gx-1) + rst.gy*(p1.y + i) + p1.x;
             }
         }
         else if ((p1.y-p2.y) == 1) {
@@ -357,7 +357,7 @@ int* getIndex(point p1, point p2, routingInst rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                
+                index[i] = (rst.gy)*(rst.gx-1) + rst.gy*(p2.y + i) + p1.x;
             }
         } // case where p1.y-p2.y > 1
     }
