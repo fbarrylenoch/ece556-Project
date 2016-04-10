@@ -13,6 +13,7 @@
 
 #include <fstream>
 using std::ifstream;
+using std::ofstream;
 
 #include <iostream>
 using std::cout;

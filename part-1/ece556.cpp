@@ -238,12 +238,12 @@ int writeOutput(const char *outRouteFile, routingInst *rst){
 
                         net tmpNet = rst->nets[i];
                         route tmpRoute = tmpNet.nroute;
-                        output << "n" + tmpNet.id + "\n";
+                        output << "n" << tmpNet.id << "\n";
 
                         for (int j = 0; j < tmpRoute.numSegs; j++) {
                                 segment tmpSeg = tmpRoute.segments[j];
-                                output << "("+tmpSeg.p1.x+","+tmpSeg.p1.y+")-("+
-                                        tmpSeg.p2.x+","+tmpSeg.p2.y+")\n";
+                                output << "(" << tmpSeg.p1.x << "," << tmpSeg.p1.y << ")-(" << 
+                                        tmpSeg.p2.x << "," << tmpSeg.p2.y << ")\n";
                         }
                         output << "!\n";
                 }
