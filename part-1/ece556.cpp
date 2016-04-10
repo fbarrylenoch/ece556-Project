@@ -302,7 +302,7 @@ int release(routingInst *rst){
                 }
 
                 delete rst->edgeCaps;
-                delete rst->edgeUtils;
+                //delete rst->edgeUtils;
 
                 delete rst;
 
