@@ -303,16 +303,20 @@ int getIndex(point p1, point p2, routingInst rst){
         // calculate index in rst->edgeCaps
         if ((p1.x-p2.x) == -1)
             index = (rst.gx-1)*p1.y + p1.x;
+        else if((p1.x-p2.x) < -1) {}            
         else if((p1.x-p2.x) == 1) 
             index = (rst.gx-1)*p1.y + p2.x;
+        else {} // case where p1.x-p2.x > 1
     }
     // else vertical line
     else if(p1.x == p2.x){
         // calculate index in rst->edgeCaps
         if ((p1.y-p2.y) == -1)
             index = (rst.gy)*(rst.gx-1) + rst.gy*p1.y + p1.x;
+        else if ((p1.y-p2.y) < -1) {}
         else if ((p1.y-p2.y) == 1)
             index = (rst.gy)*(rst.gx-1) + rst.gy*p2.y + p1.x;
+        else {} // case where p1.y-p2.y > 1
     }
 
     return index;
