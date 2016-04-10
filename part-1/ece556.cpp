@@ -164,6 +164,18 @@ int solveRouting(routingInst *rst){
     /*********** TO BE FILLED BY YOU **********/
     //get every net in rst
 
+    // Test Purposes
+    for (int p = 0; p < rst->numNets; p++) {
+        net *tempNet = &(rst->nets[p]);
+        cout << "Net: " << tempNet->id << "\n";
+        for(int j = 0; j < tempNet->numPins; j++){
+            cout << "A Point in the Net (x): " << tempNet->pins[j].x << "\n";
+            cout << "A Point in the Net (y): " << tempNet->pins[j].y << "\n";
+        }
+    }
+    // End Test Purposes
+
+
     for (int i = 0; i < rst->numNets; i++) {
         net *tempNet = &(rst->nets[i]);
         tempNet->nroute.numSegs = 0;
@@ -173,7 +185,7 @@ int solveRouting(routingInst *rst){
 
             point p1 = tempNet->pins[j];
             point p2 = tempNet->pins[j+1];
-            if ((p1.x == p2.x || p1.y == p2.y)) {
+            if (p1.x == p2.x || p1.y == p2.y) {
                 segment tempSeg = tempNet->nroute.segments[tempNet->nroute.numSegs];
                 tempNet->nroute.numSegs++;
 		tempSeg.p1 = p1;
