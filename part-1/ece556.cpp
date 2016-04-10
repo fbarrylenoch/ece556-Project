@@ -179,61 +179,86 @@ int solveRouting(routingInst *rst){
     for (int i = 0; i < rst->numNets; i++) {
         net *tempNet = &(rst->nets[i]);
         tempNet->nroute.numSegs = 0;
-        tempNet->nroute.segments = (segment *)malloc(tempNet->nroute.numSegs*sizeof(segment));
+
+        tempNet->nroute.segments = (segment *)malloc((tempNet->numPins-1)*2*sizeof(segment));
 
         for (int j = 0; j < tempNet->numPins-1; j++) {
 
             point p1 = tempNet->pins[j];
             point p2 = tempNet->pins[j+1];
             if (p1.x == p2.x || p1.y == p2.y) {
-                segment tempSeg = tempNet->nroute.segments[tempNet->nroute.numSegs];
+                segment *tempSeg = &(tempNet->nroute.segments[tempNet->nroute.numSegs]);
                 tempNet->nroute.numSegs++;
-		tempSeg.p1 = p1;
-                tempSeg.p2 = p2;
-                tempSeg.numEdges = 1;
-                tempSeg.edges = (int *)malloc(4*sizeof(int));
-                tempSeg.edges[0] = p1.x;
-		tempSeg.edges[1] = p1.y;
-		tempSeg.edges[2] = p2.x;
-		tempSeg.edges[3] = p2.y;
+                tempSeg->p1 = p1;
+                tempSeg->p2 = p2;
+                if (p1.x == p2.x) {
+                    tempSeg->numEdges = abs(p1.y - p2.y);
+                }
+                else {
+                    tempSeg->numEdges = abs(p1.x - p2.x);
+                }
+
+
+
+                // Needs to be changed after getIndex is complete
+                tempSeg->edges = (int *)malloc(4*sizeof(int));
+                tempSeg->edges[0] = p1.x;
+                tempSeg->edges[1] = p1.y;
+                tempSeg->edges[2] = p2.x;
+                tempSeg->edges[3] = p2.y;
+                // End of Changes to be made
+
+
+
             }
             else {
                 point topP;
                 point bottomP;
                 if (p1.y < p2.y) {
-                    topP = p1;
-                    bottomP = p2;
-                }
-                else {
                     topP = p2;
                     bottomP = p1;
+                }
+                else {
+                    topP = p1;
+                    bottomP = p2;
                  }
                 // add topP to midPoint
-                segment tempSeg = tempNet->nroute.segments[tempNet->nroute.numSegs];
-		tempNet->nroute.numSegs++;
-                tempSeg.p1 = topP;
+                segment *tempSeg = &(tempNet->nroute.segments[tempNet->nroute.numSegs]);
+                tempNet->nroute.numSegs++;
+                tempSeg->p1 = topP;
                 point *midPoint = new point;
                 midPoint->x = topP.x;
                 midPoint->y = bottomP.y;
-                tempSeg.p2 = *midPoint;
-                tempSeg.numEdges = 1;
-                tempSeg.edges = (int *)malloc(4*sizeof(int));
-                tempSeg.edges[0] = topP.x;
-		tempSeg.edges[1] = topP.y;
-		tempSeg.edges[2] = midPoint->x;
-		tempSeg.edges[3] = midPoint->y;
+                tempSeg->p2 = *midPoint;
+                tempSeg->numEdges = abs(topP.y - midPoint->y);
+
+
+                // Needs to be changed after getIndex is complete
+                tempSeg->edges = (int *)malloc(4*sizeof(int));
+                tempSeg->edges[0] = topP.x;
+                tempSeg->edges[1] = topP.y;
+                tempSeg->edges[2] = midPoint->x;
+                tempSeg->edges[3] = midPoint->y;
+                // End Changes
+
 
                 //add midPoint to bottomP
-                tempSeg = tempNet->nroute.segments[tempNet->nroute.numSegs];
-		tempNet->nroute.numSegs++;
-                tempSeg.p1 = *midPoint;
-                tempSeg.p2 = bottomP;
-                tempSeg.numEdges = 1;
-                tempSeg.edges = (int *)malloc(4*sizeof(int));
-                tempSeg.edges[0] = midPoint->x;
-                tempSeg.edges[1] = midPoint->y; 
-                tempSeg.edges[2] = bottomP.x;
-                tempSeg.edges[3] = bottomP.y;
+                tempSeg = &(tempNet->nroute.segments[tempNet->nroute.numSegs]);
+                tempNet->nroute.numSegs++;
+                tempSeg->p1 = *midPoint;
+                tempSeg->p2 = bottomP;
+                tempSeg->numEdges = abs(midPoint->x - bottomP.x);
+
+
+                // Needs to be changed after getIndex is complete
+                tempSeg->edges = (int *)malloc(4*sizeof(int));
+                tempSeg->edges[0] = midPoint->x;
+                tempSeg->edges[1] = midPoint->y; 
+                tempSeg->edges[2] = bottomP.x;
+                tempSeg->edges[3] = bottomP.y;
+                // End Changes
+
+
             }
         }
     }
@@ -288,3 +313,9 @@ int release(routingInst *rst){
 }
 
 
+int getIndex(point p1, point p2){
+    int index = -1;
+
+
+    return index;
+}
