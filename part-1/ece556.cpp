@@ -12,7 +12,6 @@ void handler(int sig) {
 }
 
 int readBenchmark(const char *fileName, routingInst *rst){
-  /*********** TO BE FILLED BY YOU **********/  
     ifstream fin;
     fin.open(fileName);
     if(!fin.good()) return 0;
@@ -148,34 +147,19 @@ int readBenchmark(const char *fileName, routingInst *rst){
                         yCap = y2;
 
                     // number of horizontal indexes
-                    int horizontalIndexes = (rst->gy)*(rst->gx - 1);
+                    rst->horizontalIndexes = (rst->gy)*(rst->gx - 1);
 
-                    int index = horizontalIndexes + 3*yCap + x1;
+                    int index = rst->horizontalIndexes + 3*yCap + x1;
                     rst->edgeCaps[index] = updatedCap;
                 }
             }
         }
     }
-    //cout << "the first point of the last net = " << rst->nets[rst->numNets-1].pins[0].x << " " << rst->nets[rst->numNets-1].pins[0].y  << endl;
     return 1;
 }
 
 int solveRouting(routingInst *rst){
-    /*********** TO BE FILLED BY YOU **********/
     //get every net in rst
-
-    // Test Purposes
-    for (int p = 0; p < rst->numNets; p++) {
-        net *tempNet = &(rst->nets[p]);
-        cout << "Net: " << tempNet->id << "\n";
-        for(int j = 0; j < tempNet->numPins; j++){
-            cout << "A Point in the Net (x): " << tempNet->pins[j].x << "\n";
-            cout << "A Point in the Net (y): " << tempNet->pins[j].y << "\n";
-        }
-    }
-    // End Test Purposes
-
-
     for (int i = 0; i < rst->numNets; i++) {
         net *tempNet = &(rst->nets[i]);
         tempNet->nroute.numSegs = 0;
@@ -266,7 +250,6 @@ int solveRouting(routingInst *rst){
 }
 
 int writeOutput(const char *outRouteFile, routingInst *rst){
-    /*********** TO BE FILLED BY YOU **********/
 	try {
                 ofstream output;
                 output.open(outRouteFile);
@@ -293,7 +276,6 @@ int writeOutput(const char *outRouteFile, routingInst *rst){
 
 
 int release(routingInst *rst){
-    /*********** TO BE FILLED BY YOU **********/
 	try {
                 for (int i = 0; i < rst->numNets; i++) {
                         net deleteNet = rst->nets[i];
@@ -315,6 +297,7 @@ int release(routingInst *rst){
 
 int getIndex(point p1, point p2){
     int index = -1;
+
 
 
     return index;

@@ -86,6 +86,7 @@ using std::endl;
    int numEdges ; 	/* number of edges of the grid */
    int *edgeCaps; 	/* array of the actual edge capacities after considering for blockages */
    int *edgeUtils;	/* array of edge utilizations */  
+   int horizontalIndexes; /* number of horizontal edges in the grid */
    
   } routingInst ;
   
