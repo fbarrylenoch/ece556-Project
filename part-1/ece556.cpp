@@ -297,6 +297,7 @@ int release(routingInst *rst){
 
 int* getIndex(point p1, point p2, routingInst rst){
     int *index;
+    int distance;
     index = (int *)malloc(sizeof(int));
     index[0] = -1;
 
@@ -304,29 +305,61 @@ int* getIndex(point p1, point p2, routingInst rst){
     if (p1.y == p1.y) {
         // calculate index in rst->edgeCaps
         if ((p1.x-p2.x) == -1) {
+            delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst.gx-1)*p1.y + p1.x;
         }
-        //else if((p1.x-p2.x) < -1) {}            
+        else if((p1.x-p2.x) < -1) {
+            distance = abs(p1.x-p2.x);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                
+            }
+        }            
         else if((p1.x-p2.x) == 1) {
+            delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst.gx-1)*p1.y + p2.x;
         }
-        //else {} // case where p1.x-p2.x > 1
+        else {
+            distance = abs(p1.x-p2.x);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                
+            }
+        } // case where p1.x-p2.x > 1
     }
     // else vertical line
     else if(p1.x == p2.x){
         // calculate index in rst->edgeCaps
         if ((p1.y-p2.y) == -1) {
+            delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst.gy)*(rst.gx-1) + rst.gy*p1.y + p1.x;
         }
-        //else if ((p1.y-p2.y) < -1) {}
+        else if ((p1.y-p2.y) < -1) {
+            distance = abs(p1.x-p2.x);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                
+            }
+        }
         else if ((p1.y-p2.y) == 1) {
+            delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst.gy)*(rst.gx-1) + rst.gy*p2.y + p1.x;
         }
-        //else {} // case where p1.y-p2.y > 1
+        else {
+            distance = abs(p1.x-p2.x);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                
+            }
+        } // case where p1.y-p2.y > 1
     }
 
     return index;
