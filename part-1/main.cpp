@@ -18,11 +18,7 @@ int main(int argc, char **argv)
  	routingInst *rst = new routingInst;
 	
  	/// read benchmark
-    printf("about to enter read Benchmark\n");
     status = readBenchmark(inputFileName, rst);
-    for(int i = 0; i < rst->numEdges; i++)
-        cout << "edge weight of e" << i << " = " << rst->edgeCaps[i] << "\t";
-    cout << endl;
  	if(status==0){
  		printf("ERROR: reading input file \n");
  		return 1;
