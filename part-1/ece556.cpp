@@ -1,5 +1,74 @@
 #include "ece556.h"
 
+int* getIndex(point p1, point p2, routingInst *rst){
+    int *index;
+    int distance;
+    index = (int *)malloc(sizeof(int));
+    index[0] = -1;
+
+    // check if horizontal line
+    if (p1.y == p2.y) {
+        // calculate index in rst->edgeCaps
+        if ((p1.x-p2.x) == -1) {
+            delete index;
+            index = (int *)malloc(sizeof(int));
+            index[0] = (rst->gx-1)*p1.y + p1.x;
+        }
+        else if((p1.x-p2.x) < -1) {
+            distance = abs(p1.x-p2.x);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                index[i] = (rst->gx-1)*p1.y + p1.x + i;
+            }
+        }            
+        else if((p1.x-p2.x) == 1) {
+            delete index;
+            index = (int *)malloc(sizeof(int));
+            index[0] = (rst->gx-1)*p1.y + p2.x;
+        }
+        else {
+            distance = abs(p1.x-p2.x);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                index[i] = (rst->gx-1)*p1.y + p2.x + i;
+            }
+        } // case where p1.x-p2.x > 1
+    }
+    // else vertical line
+    else if(p1.x == p2.x){
+        // calculate index in rst->edgeCaps
+        if ((p1.y-p2.y) == -1) {
+            delete index;
+            index = (int *)malloc(sizeof(int));
+            index[0] = (rst->gy)*(rst->gx-1) + rst->gy*p1.y + p1.x;
+        }
+        else if ((p1.y-p2.y) < -1) {
+            distance = abs(p1.y-p2.y);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                index[i] = (rst->gy)*(rst->gx-1) + rst->gy*(p1.y + i) + p1.x;
+            }
+        }
+        else if ((p1.y-p2.y) == 1) {
+            delete index;
+            index = (int *)malloc(sizeof(int));
+            index[0] = (rst->gy)*(rst->gx-1) + rst->gy*p2.y + p1.x;
+        }
+        else {
+            distance = abs(p1.y-p2.y);
+            delete index;
+            index = (int *)malloc(distance*sizeof(int));
+            for (int i=0; i < distance; i++) {
+                index[i] = (rst->gy)*(rst->gx-1) + rst->gy*(p2.y + i) + p1.x;
+            }
+        } // case where p1.y-p2.y > 1
+    }
+    return index;
+}
+
 void handler(int sig) {
     void *array[10];
     size_t size;
@@ -206,43 +275,47 @@ int solveRouting(routingInst *rst){
                     topP = p1;
                     bottomP = p2;
                  }
+
                 // add topP to midPoint
                 segment *tempSeg = &(tempNet->nroute.segments[tempNet->nroute.numSegs]);
                 tempNet->nroute.numSegs++;
                 tempSeg->p1 = topP;
-                point *midPoint = new point;
-                midPoint->x = topP.x;
-                midPoint->y = bottomP.y;
-                tempSeg->p2 = *midPoint;
-                tempSeg->numEdges = abs(topP.y - midPoint->y);
+                point midPoint;
+                midPoint.x = topP.x;
+                midPoint.y = bottomP.y;
+                tempSeg->p2 = midPoint;
+                tempSeg->numEdges = abs(topP.y - midPoint.y);
 
+                // save edges to the segment
+                int* tempEdges = getIndex(topP,midPoint,rst);
+                tempSeg->edges = (int *)malloc(tempSeg->numEdges*sizeof(int));
+                tempSeg->edges = tempEdges;
 
-                // Needs to be changed after getIndex is complete
-                tempSeg->edges = (int *)malloc(4*sizeof(int));
-                tempSeg->edges[0] = topP.x;
-                tempSeg->edges[1] = topP.y;
-                tempSeg->edges[2] = midPoint->x;
-                tempSeg->edges[3] = midPoint->y;
-                // End Changes
+                // uncomment for test purposes
+                /*cout << "Start Segment:\n";
+                for (int i = 0; i < tempSeg->numEdges; i++) {
+                    cout << "edge: " << tempSeg->edges[i] << "\n";
+                }
+                cout << "\n";*/
 
-
-                //add midPoint to bottomP
+                // add midPoint to bottomP
                 tempSeg = &(tempNet->nroute.segments[tempNet->nroute.numSegs]);
                 tempNet->nroute.numSegs++;
-                tempSeg->p1 = *midPoint;
+                tempSeg->p1 = midPoint;
                 tempSeg->p2 = bottomP;
-                tempSeg->numEdges = abs(midPoint->x - bottomP.x);
+                tempSeg->numEdges = abs(midPoint.x - bottomP.x);
 
+                // save edges to the segment
+                tempEdges = getIndex(midPoint,bottomP,rst);
+                tempSeg->edges = (int *)malloc(tempSeg->numEdges*sizeof(int));
+                tempSeg->edges = tempEdges;
 
-                // Needs to be changed after getIndex is complete
-                tempSeg->edges = (int *)malloc(4*sizeof(int));
-                tempSeg->edges[0] = midPoint->x;
-                tempSeg->edges[1] = midPoint->y; 
-                tempSeg->edges[2] = bottomP.x;
-                tempSeg->edges[3] = bottomP.y;
-                // End Changes
-
-
+                // uncomment for test purposes
+                /*cout << "Start Segment:\n";
+                for (int i = 0; i < tempSeg->numEdges; i++) {
+                    cout << "edge: " << tempSeg->edges[i] << "\n";
+                }
+                cout << "\n";*/
             }
         }
     }
@@ -292,75 +365,4 @@ int release(routingInst *rst){
                 return 0;
         }
     return 1;
-}
-
-
-int* getIndex(point p1, point p2, routingInst rst){
-    int *index;
-    int distance;
-    index = (int *)malloc(sizeof(int));
-    index[0] = -1;
-
-    // check if horizontal line
-    if (p1.y == p1.y) {
-        // calculate index in rst->edgeCaps
-        if ((p1.x-p2.x) == -1) {
-            delete index;
-            index = (int *)malloc(sizeof(int));
-            index[0] = (rst.gx-1)*p1.y + p1.x;
-        }
-        else if((p1.x-p2.x) < -1) {
-            distance = abs(p1.x-p2.x);
-            delete index;
-            index = (int *)malloc(distance*sizeof(int));
-            for (int i=0; i < distance; i++) {
-                index[0] = (rst.gx-1)*p1.y + p1.x + i;
-            }
-        }            
-        else if((p1.x-p2.x) == 1) {
-            delete index;
-            index = (int *)malloc(sizeof(int));
-            index[0] = (rst.gx-1)*p1.y + p2.x;
-        }
-        else {
-            distance = abs(p1.x-p2.x);
-            delete index;
-            index = (int *)malloc(distance*sizeof(int));
-            for (int i=0; i < distance; i++) {
-                index[0] = (rst.gx-1)*p1.y + p2.x + i;
-            }
-        } // case where p1.x-p2.x > 1
-    }
-    // else vertical line
-    else if(p1.x == p2.x){
-        // calculate index in rst->edgeCaps
-        if ((p1.y-p2.y) == -1) {
-            delete index;
-            index = (int *)malloc(sizeof(int));
-            index[0] = (rst.gy)*(rst.gx-1) + rst.gy*p1.y + p1.x;
-        }
-        else if ((p1.y-p2.y) < -1) {
-            distance = abs(p1.x-p2.x);
-            delete index;
-            index = (int *)malloc(distance*sizeof(int));
-            for (int i=0; i < distance; i++) {
-                index[i] = (rst.gy)*(rst.gx-1) + rst.gy*(p1.y + i) + p1.x;
-            }
-        }
-        else if ((p1.y-p2.y) == 1) {
-            delete index;
-            index = (int *)malloc(sizeof(int));
-            index[0] = (rst.gy)*(rst.gx-1) + rst.gy*p2.y + p1.x;
-        }
-        else {
-            distance = abs(p1.x-p2.x);
-            delete index;
-            index = (int *)malloc(distance*sizeof(int));
-            for (int i=0; i < distance; i++) {
-                index[i] = (rst.gy)*(rst.gx-1) + rst.gy*(p2.y + i) + p1.x;
-            }
-        } // case where p1.y-p2.y > 1
-    }
-
-    return index;
 }
