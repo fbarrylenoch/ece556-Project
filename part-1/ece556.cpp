@@ -117,6 +117,11 @@ int readBenchmark(const char *fileName, routingInst *rst){
             rst->gy = y;
             rst->numEdges = y*(x-1) + x*(y-1);
             rst->edgeCaps = (int *)malloc(rst->numEdges * sizeof(int));
+            rst->edgeUtils = (int *)malloc(rst->numEdges * sizeof(int));
+            // going to set edgeUtils to 0 as a default and 1 if the edge is utilized
+            for (int i = 0; i < rst->numEdges; i++) {
+                rst->edgeUtils[i] = 0;
+            }
         }
         else if(strncmp(token[0], "capacity",64) == 0){
             rst->cap = atoi(token[1]);
@@ -229,6 +234,8 @@ int readBenchmark(const char *fileName, routingInst *rst){
 
 int solveRouting(routingInst *rst){
     //get every net in rst
+    int TOF = 0; // temporarily being used to calculate total overflow
+    int TWL = 0; // temporarily being used to calculate total wire length
     for (int i = 0; i < rst->numNets; i++) {
         net *tempNet = &(rst->nets[i]);
         tempNet->nroute.numSegs = 0;
@@ -251,17 +258,14 @@ int solveRouting(routingInst *rst){
                     tempSeg->numEdges = abs(p1.x - p2.x);
                 }
 
+                int* tempEdges = getIndex(p1,p2,rst);
+                tempSeg->edges = (int *)malloc(tempSeg->numEdges*sizeof(int));
+                tempSeg->edges = tempEdges;
 
-
-                // Needs to be changed after getIndex is complete
-                tempSeg->edges = (int *)malloc(4*sizeof(int));
-                tempSeg->edges[0] = p1.x;
-                tempSeg->edges[1] = p1.y;
-                tempSeg->edges[2] = p2.x;
-                tempSeg->edges[3] = p2.y;
-                // End of Changes to be made
-
-
+                for (int i = 0; i < tempSeg->numEdges; i++){
+                    rst->edgeCaps[tempSeg->edges[i]]--;
+                    rst->edgeUtils[tempSeg->edges[i]]++;
+                }
 
             }
             else {
@@ -274,7 +278,7 @@ int solveRouting(routingInst *rst){
                 else {
                     topP = p1;
                     bottomP = p2;
-                 }
+                }
 
                 // add topP to midPoint
                 segment *tempSeg = &(tempNet->nroute.segments[tempNet->nroute.numSegs]);
@@ -290,6 +294,11 @@ int solveRouting(routingInst *rst){
                 int* tempEdges = getIndex(topP,midPoint,rst);
                 tempSeg->edges = (int *)malloc(tempSeg->numEdges*sizeof(int));
                 tempSeg->edges = tempEdges;
+
+                for (int i = 0; i < tempSeg->numEdges; i++){
+                    rst->edgeCaps[tempSeg->edges[i]]--;
+                    rst->edgeUtils[tempSeg->edges[i]]++;
+                }
 
                 // uncomment for test purposes
                 /*cout << "Start Segment:\n";
@@ -310,6 +319,11 @@ int solveRouting(routingInst *rst){
                 tempSeg->edges = (int *)malloc(tempSeg->numEdges*sizeof(int));
                 tempSeg->edges = tempEdges;
 
+                for (int i = 0; i < tempSeg->numEdges; i++){
+                    rst->edgeCaps[tempSeg->edges[i]]--;
+                    rst->edgeUtils[tempSeg->edges[i]]++;
+                }
+
                 // uncomment for test purposes
                 /*cout << "Start Segment:\n";
                 for (int i = 0; i < tempSeg->numEdges; i++) {
@@ -319,50 +333,57 @@ int solveRouting(routingInst *rst){
             }
         }
     }
-  return 1;
+
+    // I am like 80% sure this works...
+    for (int i = 0; i < rst->numEdges; i++){
+        if (rst->edgeCaps[i] < 0)
+            TOF = TOF + abs(rst->edgeCaps[i]);
+        if (rst->edgeUtils[i] > 0)
+            TWL = TWL + rst->edgeUtils[i];
+    }
+    cout << "Total Overflow: " << TOF << "\n";
+    cout << "Total Wire Length: " << TWL << "\n";
+    return 1;
 }
 
 int writeOutput(const char *outRouteFile, routingInst *rst){
 	try {
-                ofstream output;
-                output.open(outRouteFile);
+        ofstream output;
+        output.open(outRouteFile);
 
-                for (int i = 0; i < rst->numNets; i++) {
+        for (int i = 0; i < rst->numNets; i++) {
 
-                        net tmpNet = rst->nets[i];
-                        route tmpRoute = tmpNet.nroute;
-                        output << "n" << tmpNet.id << "\n";
+            net tmpNet = rst->nets[i];
+            route tmpRoute = tmpNet.nroute;
+            output << "n" << tmpNet.id << "\n";
 
-                        for (int j = 0; j < tmpRoute.numSegs; j++) {
-                                segment tmpSeg = tmpRoute.segments[j];
-                                output << "(" << tmpSeg.p1.x << "," << tmpSeg.p1.y << ")-(" << 
-                                        tmpSeg.p2.x << "," << tmpSeg.p2.y << ")\n";
-                        }
-                        output << "!\n";
-                }
-                output.close();
-        } catch(int e) {
-                return 0;
+            for (int j = 0; j < tmpRoute.numSegs; j++) {
+                segment tmpSeg = tmpRoute.segments[j];
+                output << "(" << tmpSeg.p1.x << "," << tmpSeg.p1.y << ")-(" << 
+                    tmpSeg.p2.x << "," << tmpSeg.p2.y << ")\n";
+            }
+            output << "!\n";
         }
+        output.close();
+    } catch(int e) {
+        return 0;
+    }
     return 1;
 }
 
 
 int release(routingInst *rst){
 	try {
-                for (int i = 0; i < rst->numNets; i++) {
-                        net deleteNet = rst->nets[i];
-                        delete deleteNet.nroute.segments;
-                        delete deleteNet.pins;
-                }
-
-                delete rst->edgeCaps;
-                //delete rst->edgeUtils;
-
-                delete rst;
-
-        } catch(int e) {
-                return 0;
+        for (int i = 0; i < rst->numNets; i++) {
+            net deleteNet = rst->nets[i];
+            delete deleteNet.nroute.segments;
+            delete deleteNet.pins;
         }
+        delete rst->edgeCaps;
+        delete rst;
+
+    } catch(int e) {
+        return 0;
+    }
     return 1;
 }
