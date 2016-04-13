@@ -88,7 +88,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
     //read each line of the file
     const char* token[20] = {}; // initialize to 0
     while(!fin.eof()){
-        cout << "Hi\n";
         v++;
         // read an entire line into memory
         char buf[512];
