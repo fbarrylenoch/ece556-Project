@@ -74,9 +74,16 @@ bool RRR(routingInst *rst, net *netRRR){
     int* indices;
     point p1;
     point p2;
-    route routeRRR = netRRR->nroute;
+    route routeRRR;
     segment *segRRR;
+    // routes for each shape attempt - not sure if I will use these
+    route routeL; /* used to store the best L route option */
+    route routeZ; /* used to store the best Z route option */
+    route routeU; /* used to store the best U route option */
+    route routeC; /* used to store the best C route option */
+    route routeComp; /* used to compare different variations of each route shape */
 
+    routeRRR = netRRR->nroute;
     // rip up
     for (int i = 0; i < routeRRR.numSegs; i++){ /* get each segment in the net*/
         segRRR = &(routeRRR.segments[i]);
