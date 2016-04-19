@@ -112,7 +112,11 @@ bool RRR(routingInst *rst, net *netRRR){
 
         // compare each attempt, take best option
 
-    // return successful
+
+    // if error for any reason, return false
+    /* return false; */
+
+    // else return successful
     return true;
 }
 
