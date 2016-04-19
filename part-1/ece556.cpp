@@ -69,7 +69,7 @@ int* getIndex(point p1, point p2, routingInst *rst){
     return index;
 }
 
-// will be called to rip up and reroute a net
+//will be called to rip up and reroute a net
 bool RRR(routingInst *rst, net *netRRR){
     int* indices;
     point p1;
@@ -78,14 +78,16 @@ bool RRR(routingInst *rst, net *netRRR){
     segment *segRRR;
 
     // rip up
-    for (int i = 0; i < routeRRR.numSegs; i++){
+    for (int i = 0; i < routeRRR.numSegs; i++){ /* get each segment in the net*/
         segRRR = &(routeRRR.segments[i]);
 
+        // assign endpoints of the segment
         p1 = segRRR->p1;
         p2 = segRRR->p2;
 
-        indices = getIndex(p1,p2,rst);
+        indices = getIndex(p1,p2,rst);  /* get the edge indices of the segment*/
 
+        // update utilizations and weights for each edge
         for (int i = 0; i < segRRR->numEdges; i++){
             rst->edgeCaps[segRRR->edges[i]]++;
             rst->edgeUtils[segRRR->edges[i]]--;
