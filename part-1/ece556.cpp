@@ -193,14 +193,21 @@ int readBenchmark(const char *fileName, routingInst *rst){
                         if (!token[m]) break; // no more tokens
                     }
                 }
-                int x1 = atoi(token[0]);
-                int y1 = atoi(token[1]);
-                int x2 = atoi(token[2]);
-                int y2 = atoi(token[3]);
+                int *index;
+                point *p1 = new point;
+                point *p2 = new point;
+                p1->x = atoi(token[0]);
+                p1->y = atoi(token[1]);
+                p2->x = atoi(token[2]);
+                p2->y = atoi(token[3]);
                 int updatedCap = atoi(token[4]);
+                index = getIndex(*p1, *p2, rst);
+                rst->edgeCaps[index[0]] = updatedCap;
+                delete p1;
+                delete p2;
 
                 // check if horizontal line
-                if (y1 == y2) {
+                /*if (y1 == y2) {
                     // calculate index in rst->edgeCaps
                     int xCap = 0;
                     if (x1 < x2)
@@ -225,7 +232,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
 
                     int index = rst->horizontalIndexes + 3*yCap + x1;
                     rst->edgeCaps[index] = updatedCap;
-                }
+                }*/
             }
         }
     }
