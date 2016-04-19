@@ -69,15 +69,35 @@ int* getIndex(point p1, point p2, routingInst *rst){
     return index;
 }
 
-int RRR(routingInst *rst, net x){
+int RRR(routingInst *rst, net *netRRR){
     // will be called to rip up and reroute a net
+    int* indices;
+    point p1;
+    point p2;
+    route routeRRR = netRRR->nroute;
+    segment *segRRR;
 
     // rip up
+    for (int i = 0; i < routeRRR.numSegs; i++){
+        segRRR = &(routeRRR.segments[i]);
 
+        p1 = segRRR->p1;
+        p2 = segRRR->p2;
+
+        indices = getIndex(p1,p2,rst);
+
+        for (int i = 0; i < segRRR->numEdges; i++){
+            rst->edgeCaps[segRRR->edges[i]]++;
+            rst->edgeUtils[segRRR->edges[i]]--;
+        }
+    }
 
     // reroute
 
 
+
+    // return successful
+    return 1;
 }
 
 void handler(int sig) {
