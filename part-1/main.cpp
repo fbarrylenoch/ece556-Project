@@ -4,11 +4,15 @@
 
 int main(int argc, char **argv)
 {
+    time_t init_time, curr_time;
+    double seconds;
+
     signal(SIGSEGV, handler);
  	if(argc!=3){
  		printf("Usage : ./ROUTE.exe <input_benchmark_name> <output_file_name> \n");
  		return 1;
  	}
+    time(&init_time);
 
  	int status;
 	char *inputFileName = argv[1];
@@ -41,6 +45,10 @@ int main(int argc, char **argv)
  	}
 
  	release(rst);
+    usleep(50000);
+    time(&curr_time);
+    seconds = difftime(curr_time, init_time);
+    printf("That took %.3f seconds", seconds);
  	printf("\nDONE!\n\n");
  	return 0;
 }
