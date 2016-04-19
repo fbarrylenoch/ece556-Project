@@ -79,6 +79,7 @@ bool RRR(routingInst *rst, net *netRRR){
     // routes for each shape attempt - not sure if I will use these
     route routeL; /* used to store the best L route option */
     route routeZ; /* used to store the best Z route option */
+    route routeRZ; /* used to store the best Rotated Z route option */
     route routeU; /* used to store the best U route option */
     route routeC; /* used to store the best C route option */
 
@@ -106,6 +107,8 @@ bool RRR(routingInst *rst, net *netRRR){
 
         // try Z shape - maybe seperate method?
 
+        // try Rotated Z shape - maybe seperate method?
+
         // try U shape - maybe seperate method?
 
         // try C shape - maybe seperate method?
@@ -125,15 +128,58 @@ route shapeL(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
     route routeL; /* used to store the best L route option */
     
+    // check if straight line
+
+    // assign same result as initial solution
+
+    // assign L in other direction
+
+    // compare and take route with lowest weight
+
+    // return the route
     return routeL;
 }
 
-// returns best Z shape route - return straight line if in line
+// returns best Z shape route - call shapeL if too close to make a Z
 route shapeZ(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
     route routeZ; /* used to store the best Z route option */
-    
+
+    // call shapeL if too close
+    if (abs(p1.x - p2.x) < 2) {
+        routeZ = shapeL(p1,p2,rst);
+    }
+
+    // else loop for all possible Z routes
+    else {
+        for (int i = 0; i < (abs(p1.x - p2.x)-1); i++){
+            
+        }
+    }
+
+    // return the route
     return routeZ;
+}
+
+// returns best Rotated Z shape route - call shapeL if too close to make a RZ
+route shapeRZ(point p1, point p2, routingInst *rst){
+    route routeComp; /* used to compare different variations of each route shape */
+    route routeRZ; /* used to store the best Z route option */
+
+    // call shapeL if too close
+    if (abs(p1.y - p2.y) < 2){
+        routeRZ = shapeL(p1,p2,rst);
+    }
+
+    // else loop for all possible RZ routes
+    else {
+        for (int i = 0; i < (abs(p1.y - p2.y)-1); i++){
+
+        }
+    }
+
+    // return the route
+    return routeRZ;
 }
 
 // returns best U shape route
@@ -141,6 +187,7 @@ route shapeU(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
     route routeU; /* used to store the best U route option */
     
+    // return the route
     return routeU;
 }
 
@@ -149,6 +196,7 @@ route shapeC(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
     route routeC; /* used to store the best C route option */
     
+    // return the route
     return routeC;
 }
 
