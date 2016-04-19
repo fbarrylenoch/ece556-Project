@@ -69,8 +69,8 @@ int* getIndex(point p1, point p2, routingInst *rst){
     return index;
 }
 
-int RRR(routingInst *rst, net *netRRR){
-    // will be called to rip up and reroute a net
+// will be called to rip up and reroute a net
+bool RRR(routingInst *rst, net *netRRR){
     int* indices;
     point p1;
     point p2;
@@ -97,7 +97,7 @@ int RRR(routingInst *rst, net *netRRR){
 
 
     // return successful
-    return 1;
+    return true;
 }
 
 void handler(int sig) {
