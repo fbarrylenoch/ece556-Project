@@ -96,13 +96,15 @@ bool RRR(routingInst *rst, net *netRRR){
 
     // reroute
 
-        // try L shape
+        // try L shape - maybe seperate method?
 
-        // try Z shape
+        // try Z shape - maybe seperate method?
 
-        // try U shape
+        // try U shape - maybe seperate method?
 
-        // try C shape
+        // try C shape - maybe seperate method?
+
+        // compare each attempt, take best option
 
     // return successful
     return true;
