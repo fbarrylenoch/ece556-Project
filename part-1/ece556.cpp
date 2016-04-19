@@ -69,6 +69,17 @@ int* getIndex(point p1, point p2, routingInst *rst){
     return index;
 }
 
+int RRR(routingInst *rst, net x){
+    // will be called to rip up and reroute a net
+
+    // rip up
+
+
+    // reroute
+
+
+}
+
 void handler(int sig) {
     void *array[10];
     size_t size;
