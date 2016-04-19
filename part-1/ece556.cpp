@@ -81,7 +81,6 @@ bool RRR(routingInst *rst, net *netRRR){
     route routeZ; /* used to store the best Z route option */
     route routeU; /* used to store the best U route option */
     route routeC; /* used to store the best C route option */
-    route routeComp; /* used to compare different variations of each route shape */
 
     routeRRR = netRRR->nroute;
     // rip up
@@ -115,6 +114,38 @@ bool RRR(routingInst *rst, net *netRRR){
 
     // return successful
     return true;
+}
+
+// returns best L shape route - return straight line if in line
+route shapeL(point p1, point p2, routingInst *rst){
+    route routeComp; /* used to compare different variations of each route shape */
+    route routeL; /* used to store the best L route option */
+    
+    return routeL;
+}
+
+// returns best Z shape route - return straight line if in line
+route shapeZ(point p1, point p2, routingInst *rst){
+    route routeComp; /* used to compare different variations of each route shape */
+    route routeZ; /* used to store the best Z route option */
+    
+    return routeZ;
+}
+
+// returns best U shape route
+route shapeU(point p1, point p2, routingInst *rst){
+    route routeComp; /* used to compare different variations of each route shape */
+    route routeU; /* used to store the best U route option */
+    
+    return routeU;
+}
+
+// returns best C shape route
+route shapeC(point p1, point p2, routingInst *rst){
+    route routeComp; /* used to compare different variations of each route shape */
+    route routeC; /* used to store the best C route option */
+    
+    return routeC;
 }
 
 void handler(int sig) {
