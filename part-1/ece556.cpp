@@ -101,8 +101,14 @@ bool RRR(routingInst *rst, net *netRRR){
         }
     }
 
-    // reroute
+    // clear the segments of the route
+    routeRRR.numSegs = 0;
+    delete routeRRR.segments;
 
+    // reroute
+    /* allocate enough memory for every connection from pin to pin to be the largest number of segments */
+    routeRRR.segments = (segment *)malloc((netRRR->numPins-1)*3*sizeof(segment));
+     
         // try L shape - maybe seperate method?
 
         // try Z shape - maybe seperate method?
@@ -111,7 +117,11 @@ bool RRR(routingInst *rst, net *netRRR){
 
         // try U shape - maybe seperate method?
 
+        // try Rotated U shape - maybe seperate method?
+
         // try C shape - maybe seperate method?
+
+        // try Rotated C shape - maybe seperate method?
 
         // compare each attempt, take best option
 
@@ -127,15 +137,107 @@ bool RRR(routingInst *rst, net *netRRR){
 route shapeL(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
     route routeL; /* used to store the best L route option */
+    point topP; /* used to calculate route */
+    point bottomP; /* used to calculate route */
+    point midPoint; /* used to calculate route */
     
-    // check if straight line
+    /* check if straight line, assign routeL if so */
+    if (p1.x == p2.x || p1.y == p2.y) {
+        routeL.segments = (segment *)malloc(sizeof(segment));
+        routeL.numSegs = 0;
 
-    // assign same result as initial solution
+        segment *segL = &(routeL.segments[routeL.numSegs]);
+        routeL.numSegs++;
+        segL->p1 = p1;
+        segL->p2 = p2;
+        if (p1.x == p2.x) {
+            segL->numEdges = abs(p1.y - p2.y);
+        }
+        else {
+            segL->numEdges = abs(p1.x - p2.x);
+        }
 
-    // assign L in other direction
+        int* edgesL = getIndex(p1,p2,rst);
+        segL->edges = (int *)malloc(segL->numEdges*sizeof(int));
+        segL->edges = edgesL;
+    }
+    else{
 
-    // compare and take route with lowest weight
+        /* assign L shape route */
+        if (p1.y < p2.y) {
+            topP = p2;
+            bottomP = p1;
+        }
+        else {
+            topP = p1;
+            bottomP = p2;
+        }
+        // allocate routeL
+        routeL.segments = (segment *)malloc(2*sizeof(segment));
+        routeL.numSegs = 0;
+        // assign top and bottom points
+        segment *segL = &(routeL.segments[routeL.numSegs]);
+        routeL.numSegs++;
+        segL->p1 = topP;
+        // create a midPoint
+        midPoint.x = topP.x;
+        midPoint.y = bottomP.y;
+        segL->p2 = midPoint;
+        segL->numEdges = abs(topP.y - midPoint.y);
+        // save edges to the segment
+        int* edgesL = getIndex(topP,midPoint,rst);
+        segL->edges = (int *)malloc(segL->numEdges*sizeof(int));
+        segL->edges = edgesL;
+        // add midPoint to bottomP
+        segL = &(routeL.segments[routeL.numSegs]);
+        routeL.numSegs++;
+        segL->p1 = midPoint;
+        segL->p2 = bottomP;
+        segL->numEdges = abs(midPoint.x - bottomP.x);
+        // save edges to the segment
+        edgesL = getIndex(midPoint,bottomP,rst);
+        segL->edges = (int *)malloc(segL->numEdges*sizeof(int));
+        segL->edges = edgesL;
 
+        /* assign L in other direction */
+        if (p1.y < p2.y) {
+            topP = p2;
+            bottomP = p1;
+        }
+        else {
+            topP = p1;
+            bottomP = p2;
+        }
+        // allocate routeL
+        routeComp.segments = (segment *)malloc(2*sizeof(segment));
+        routeComp.numSegs = 0;
+        // assign top and bottom points
+        segment *segComp = &(routeComp.segments[routeComp.numSegs]);
+        routeComp.numSegs++;
+        segComp->p1 = topP;
+        // create a midPoint
+        midPoint.y = topP.y;
+        midPoint.x = bottomP.x;
+        segComp->p2 = midPoint;
+        segComp->numEdges = abs(topP.x - midPoint.x);
+        // save edges to the segment
+        int* edgesComp = getIndex(topP,midPoint,rst);
+        segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+        segComp->edges = edgesComp;
+        // add midPoint to bottomP
+        segComp = &(routeComp.segments[routeComp.numSegs]);
+        routeComp.numSegs++;
+        segComp->p1 = midPoint;
+        segComp->p2 = bottomP;
+        segComp->numEdges = abs(midPoint.y - bottomP.y);
+        // save edges to the segment
+        edgesComp = getIndex(midPoint,bottomP,rst);
+        segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+        segComp->edges = edgesComp;
+
+        /* compare and take route with lowest weight */
+        // need edge weight to be completed before this can be completed
+    }
     // return the route
     return routeL;
 }
@@ -144,19 +246,124 @@ route shapeL(point p1, point p2, routingInst *rst){
 route shapeZ(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
     route routeZ; /* used to store the best Z route option */
+    point topPoint; /* used to calculate route */
+    point bottomPoint; /* used to calculate route */
+    point topMidPoint; /* used to calculate route */
+    point bottomMidPoint; /* used to calculate route */
+    int multiplier; /* used to get proper dirction for route generation */
 
     // call shapeL if too close
     if (abs(p1.x - p2.x) < 2) {
         routeZ = shapeL(p1,p2,rst);
     }
 
-    // else loop for all possible Z routes
+    // else assign Z shape route
     else {
-        for (int i = 0; i < (abs(p1.x - p2.x)-1); i++){
-            
+        // allocate space for routeZ and routeComp
+        routeZ.segments = (segment *)malloc(3*sizeof(segment));
+        routeZ.numSegs = 0;
+        routeComp.segments = (segment *)malloc(3*sizeof(segment));
+        routeComp.numSegs = 0;
+        /* assign outside most Z route */
+        // assign top point
+        if (p1.y < p2.y) {
+            topPoint = p2;
+            bottomPoint = p1;
+        }
+        else {
+            topPoint = p1;
+            bottomPoint = p2;
+        }
+        // assign multiplier
+        if (topPoint.x < bottomPoint.x) {
+            multiplier = 1;
+        }
+        else {
+            multiplier = -1;
+        }
+        // create midpoints
+        topMidPoint.x = (topPoint.x + (1 * multiplier));
+        topMidPoint.y = topPoint.y;
+        bottomMidPoint.x = (topPoint.x + (1 * multiplier));
+        bottomMidPoint.y = bottomPoint.y;
+        // create top segment
+        segment *segZ = &(routeZ.segments[routeZ.numSegs]);
+        routeZ.numSegs++;
+        segZ->p1 = topPoint;
+        segZ->p2 = topMidPoint;
+        segZ->numEdges = abs(topPoint.x - topMidPoint.x);
+        // get top edges
+        int* edgesZ = getIndex(topPoint,topMidPoint,rst);
+        segZ->edges = (int *)malloc(segZ->numEdges*sizeof(int));
+        segZ->edges = edgesZ;
+        // create mid segment
+        segZ = &(routeZ.segments[routeZ.numSegs]);
+        routeZ.numSegs++;
+        segZ->p1 = topMidPoint;
+        segZ->p2 = bottomMidPoint;
+        segZ->numEdges = abs(topMidPoint.y - bottomMidPoint.y);
+        // get mid edges
+        edgesZ = getIndex(topMidPoint,bottomMidPoint,rst);
+        segZ->edges = (int *)malloc(segZ->numEdges*sizeof(int));
+        segZ->edges = edgesZ;
+        // create bottom segment
+        segZ = &(routeZ.segments[routeZ.numSegs]);
+        routeZ.numSegs++;
+        segZ->p1 = bottomMidPoint;
+        segZ->p2 = bottomPoint;
+        segZ->numEdges = abs(bottomMidPoint.x - bottomPoint.x);
+        // get bottom edges
+        edgesZ = getIndex(bottomMidPoint,bottomPoint,rst);
+        segZ->edges = (int *)malloc(segZ->numEdges*sizeof(int));
+        segZ->edges = edgesZ;
+
+        //check every other possible Z route and compare weights
+        for (int i = 1; i < (abs(p1.x - p2.x)-1); i++){
+            routeComp.numSegs = 0;
+            // create midpoints
+            topMidPoint.x = (topPoint.x + ((1 + i)*multiplier));
+            topMidPoint.y = topPoint.y;
+            bottomMidPoint.x = (topPoint.x + ((1 + i)*multiplier));
+            bottomMidPoint.y = bottomPoint.y;
+            // create top segment
+            segment *segComp = &(routeComp.segments[routeComp.numSegs]);
+            routeComp.numSegs++;
+            segComp->p1 = topPoint;
+            segComp->p2 = topMidPoint;
+            segComp->numEdges = abs(topPoint.x - topMidPoint.x);
+            // get top edges
+            int* edgesComp = getIndex(topPoint,topMidPoint,rst);
+            segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+            segComp->edges = edgesComp;
+            // create mid segment
+            segComp = &(routeComp.segments[routeComp.numSegs]);
+            routeComp.numSegs++;
+            segComp->p1 = topMidPoint;
+            segComp->p2 = bottomMidPoint;
+            segComp->numEdges = abs(topMidPoint.y - bottomMidPoint.y);
+            // get mid edges
+            edgesComp = getIndex(topMidPoint,bottomMidPoint,rst);
+            segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+            segComp->edges = edgesComp;
+            // create bottom segment
+            segComp = &(routeComp.segments[routeComp.numSegs]);
+            routeComp.numSegs++;
+            segComp->p1 = bottomMidPoint;
+            segComp->p2 = bottomPoint;
+            segComp->numEdges = abs(bottomMidPoint.x - bottomPoint.x);
+            // get bottom edges
+            edgesComp = getIndex(bottomMidPoint,bottomPoint,rst);
+            segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+            segComp->edges = edgesComp;
+
+            // check if weight is lower than routeZ, assign to routeZ if true
+            /* 
+            if (routeComp_weight < routeZ_weight){
+                routeZ = routeComp;
+            }
+            */
         }
     }
-
     // return the route
     return routeZ;
 }
@@ -165,6 +372,12 @@ route shapeZ(point p1, point p2, routingInst *rst){
 route shapeRZ(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
     route routeRZ; /* used to store the best Z route option */
+    point leftMidPoint; /* used to calculate route */
+    point rightMidPoint; /* used to calculate route */
+    point leftPoint; /* used to calculate route */
+    point rightPoint; /* used to calculate route */
+    int multiplier; /* used to get proper direction for route generation */
+
 
     // call shapeL if too close
     if (abs(p1.y - p2.y) < 2){
@@ -173,11 +386,110 @@ route shapeRZ(point p1, point p2, routingInst *rst){
 
     // else loop for all possible RZ routes
     else {
-        for (int i = 0; i < (abs(p1.y - p2.y)-1); i++){
+        // allocate space for routeRZ and routeComp
+        routeRZ.segments = (segment *)malloc(3*sizeof(segment));
+        routeRZ.numSegs = 0;
+        routeComp.segments = (segment *)malloc(3*sizeof(segment));
+        routeComp.numSegs = 0;
+        // assign farthest left oriented Z route
+        if (p1.x < p2.x) {
+            rightPoint = p2;
+            leftPoint = p1;
+        }
+        else {
+            rightPoint = p1;
+            leftPoint = p2;
+        }
+        // assign multiplier
+        if (rightPoint.y < leftPoint.y) {
+            multiplier = 1;
+        }
+        else {
+            multiplier = -1;
+        }
+        // create midpoints
+        leftMidPoint.x = leftPoint.x;
+        leftMidPoint.y = leftPoint.y - (1 * multiplier);
+        rightMidPoint.x = rightPoint.x;
+        rightMidPoint.y = leftPoint.y - (1 * multiplier);
+        // create left segment
+        segment *segRZ = &(routeRZ.segments[routeRZ.numSegs]);
+        routeRZ.numSegs++;
+        segRZ->p1 = leftPoint;
+        segRZ->p2 = leftMidPoint;
+        segRZ->numEdges = abs(leftPoint.y - leftMidPoint.y);
+        // get left edges
+        int* edgesRZ = getIndex(leftPoint,leftMidPoint,rst);
+        segRZ->edges = (int *)malloc(segRZ->numEdges*sizeof(int));
+        segRZ->edges = edgesRZ;
+        // create mid segment
+        segRZ = &(routeRZ.segments[routeRZ.numSegs]);
+        routeRZ.numSegs++;
+        segRZ->p1 = leftMidPoint;
+        segRZ->p2 = rightMidPoint;
+        segRZ->numEdges = abs(leftMidPoint.x - rightMidPoint.x);
+        // get mid edges
+        edgesRZ = getIndex(leftMidPoint,rightMidPoint,rst);
+        segRZ->edges = (int *)malloc(segRZ->numEdges*sizeof(int));
+        segRZ->edges = edgesRZ;
+        // create right segment
+        segRZ = &(routeRZ.segments[routeRZ.numSegs]);
+        routeRZ.numSegs++;
+        segRZ->p1 = rightMidPoint;
+        segRZ->p2 = rightPoint;
+        segRZ->numEdges = abs(rightMidPoint.y - rightPoint.y);
+        // get right edges
+        edgesRZ = getIndex(rightMidPoint,rightPoint,rst);
+        segRZ->edges = (int *)malloc(segRZ->numEdges*sizeof(int));
+        segRZ->edges = edgesRZ;
 
+        //check every other possible RZ route and compare weights
+        for (int i = 1; i < (abs(p1.y - p2.y)-1); i++){
+            routeComp.numSegs = 0;
+            // create midpoints
+            leftMidPoint.x = leftPoint.x;
+            leftMidPoint.y = leftPoint.y - ((1 + i) * multiplier);
+            rightMidPoint.x = rightPoint.x;
+            rightMidPoint.y = leftPoint.y - ((1 + i) * multiplier);
+            // create left segment
+            segment *segComp = &(routeComp.segments[routeComp.numSegs]);
+            routeComp.numSegs++;
+            segComp->p1 = leftPoint;
+            segComp->p2 = leftMidPoint;
+            segComp->numEdges = abs(leftPoint.y - leftMidPoint.y);
+            // get left edges
+            int* edgesComp = getIndex(leftPoint,leftMidPoint,rst);
+            segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+            segComp->edges = edgesComp;
+            // create mid segment
+            segComp = &(routeComp.segments[routeComp.numSegs]);
+            routeComp.numSegs++;
+            segComp->p1 = leftMidPoint;
+            segComp->p2 = rightMidPoint;
+            segComp->numEdges = abs(leftMidPoint.x - rightMidPoint.x);
+            // get mid edges
+            edgesComp = getIndex(leftMidPoint,rightMidPoint,rst);
+            segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+            segComp->edges = edgesComp;
+            // create right segment
+            segComp = &(routeComp.segments[routeComp.numSegs]);
+            routeComp.numSegs++;
+            segComp->p1 = rightMidPoint;
+            segComp->p2 = rightPoint;
+            segComp->numEdges = abs(rightMidPoint.y - rightPoint.y);
+            // get right edges
+            edgesComp = getIndex(rightMidPoint,rightPoint,rst);
+            segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
+            segComp->edges = edgesComp;
+
+            // check if weight is lower than routeRZ, assign to routeRZ if true
+            /* 
+            if (routeComp_weight < routeRZ_weight){
+                routeRZ = routeComp;
+            }
+            */
         }
     }
-
     // return the route
     return routeRZ;
 }
@@ -191,6 +503,15 @@ route shapeU(point p1, point p2, routingInst *rst){
     return routeU;
 }
 
+// returns the best Rotated U shape route
+route shapeRU(point p1, point p2, routingInst *rst){
+    route routeComp; /* used to compare different variations of each route shape */
+    route routeRU; /* used to store the best U route option */
+    
+    // return the route
+    return routeRU;
+}
+
 // returns best C shape route
 route shapeC(point p1, point p2, routingInst *rst){
     route routeComp; /* used to compare different variations of each route shape */
@@ -198,6 +519,15 @@ route shapeC(point p1, point p2, routingInst *rst){
     
     // return the route
     return routeC;
+}
+
+// returns best Rotated C shape route
+route shapeRC(point p1, point p2, routingInst *rst){
+    route routeComp; /* used to compare different variations of each route shape */
+    route routeRC; /* used to store the best C route option */
+    
+    // return the route
+    return routeRC;
 }
 
 void handler(int sig) {
