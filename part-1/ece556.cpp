@@ -542,7 +542,6 @@ void handler(int sig) {
 }
 
 int readBenchmark(const char *fileName, routingInst *rst){
-    cout << "Hi\n";
     ifstream fin;
     fin.open(fileName);
     if(!fin.good()) return 0;
