@@ -560,16 +560,15 @@ int readBenchmark(const char *fileName, routingInst *rst){
         // array to store memory addresses of the tokens in buff
 
         //parse the line
-        token[0] = strtok(buf, " "); // subsequent tokens
+        token[0] = strtok(buf, "\t "); // subsequent tokens
         if(token[0]){ // zerof if line is blank
             for (n = 1; n < 20; n++){
-                token[n] = strtok(0, " "); //subsequent tokens
+                token[n] = strtok(0, "\t "); //subsequent tokens
                 if (!token[n]) break; // no more tokens
             }
         }else break;
 
-
-
+        // check for grid size
         if(strncmp(token[0], "grid", 64) == 0){
             int x = atoi(token[1]);
             int y = atoi(token[2]);
@@ -584,15 +583,18 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 rst->edgeUtils[i] = 0;
             }
         }
+        // check for edge caps
         else if(strncmp(token[0], "capacity",64) == 0){
             rst->cap = atoi(token[1]);
             for (int i = 0; i < rst->numEdges; i++) 
                 rst->edgeCaps[i] = rst->cap;
         }
+        // check for number of nets
         else if(strncmp(token[0], "num", 64) == 0){
             rst->numNets = atoi(token[2]);
             rst->nets = (net *)malloc(rst->numNets*sizeof(net));
         }
+        // check for nets
         else if(strcmp(token[0], "n0") == 0){
             for(int i = 0; i < rst->numNets; i++){
                 int num = atoi(token[1]);
@@ -607,10 +609,10 @@ int readBenchmark(const char *fileName, routingInst *rst){
                     int m = 0; // a for-loop index
 
                     //parse the line
-                    token[0] = strtok(buf, " "); // subsequent tokens
+                    token[0] = strtok(buf, "\t "); // subsequent tokens
                     if(token[0]){ // zerof if line is blank
                         for (m = 1; m < 20; m++){
-                            token[m] = strtok(0, " "); //subsequent tokens
+                            token[m] = strtok(0, "\t "); //subsequent tokens
                             if (!token[m]) break; // no more tokens
                         }
                     }
@@ -629,10 +631,10 @@ int readBenchmark(const char *fileName, routingInst *rst){
                     int m = 0; // a for-loop index
 
                     //parse the line
-                    token[0] = strtok(buf, " "); // subsequent tokens
+                    token[0] = strtok(buf, "\t "); // subsequent tokens
                     if(token[0]){ // zerof if line is blank
                         for (m = 1; m < 20; m++){
-                            token[m] = strtok(0, " "); //subsequent tokens
+                            token[m] = strtok(0, "\t "); //subsequent tokens
                             if (!token[m]) break; // no more tokens
                         }
                     }
@@ -644,19 +646,16 @@ int readBenchmark(const char *fileName, routingInst *rst){
             for(int i = 0; i < num; i++){
                 fin.getline(buf, 512);
                 // parse the line into blank-delimited tokens
-                int m = 0; // a for-loop index
-
-                //parse the line
                 token[0] = strtok(buf, " "); // subsequent tokens
                 if(token[0]){ // zerof if line is blank
-                    for (m = 1; m < 20; m++){
+                    for (int m = 1; m < 20; m++){
                         token[m] = strtok(0, " "); //subsequent tokens
                         if (!token[m]) break; // no more tokens
                     }
                 }
                 int *index;
-                point *p1 = new point;
-                point *p2 = new point;
+                point* p1 = new point;
+                point* p2 = new point;
                 p1->x = atoi(token[0]);
                 p1->y = atoi(token[1]);
                 p2->x = atoi(token[2]);
@@ -666,34 +665,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
-
-                // check if horizontal line
-                /*if (y1 == y2) {
-                    // calculate index in rst->edgeCaps
-                    int xCap = 0;
-                    if (x1 < x2)
-                        xCap = x1;
-                    else  
-                        xCap = x2;
-
-                    int index = 2*y1 + xCap;
-                    rst->edgeCaps[index] = updatedCap;
-                }
-                // else vertical line
-                else {
-                    // calculate index in rst->edgeCaps
-                    int yCap = 0;
-                    if (y1 < y2)
-                        yCap = y1;
-                    else
-                        yCap = y2;
-
-                    // number of horizontal indexes
-                    rst->horizontalIndexes = (rst->gy)*(rst->gx - 1);
-
-                    int index = rst->horizontalIndexes + 3*yCap + x1;
-                    rst->edgeCaps[index] = updatedCap;
-                }*/
             }
         }
     }
