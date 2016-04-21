@@ -690,6 +690,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
 }
 
 int solveRouting(routingInst *rst){
+    cout << "entered solveRouting\n";
     //get every net in rst
     int TOF = 0; // temporarily being used to calculate total overflow
     int TWL = 0; // temporarily being used to calculate total wire length
