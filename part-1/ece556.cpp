@@ -646,10 +646,10 @@ int readBenchmark(const char *fileName, routingInst *rst){
             for(int i = 0; i < num; i++){
                 fin.getline(buf, 512);
                 // parse the line into blank-delimited tokens
-                token[0] = strtok(buf, " "); // subsequent tokens
+                token[0] = strtok(buf, "\t "); // subsequent tokens
                 if(token[0]){ // zerof if line is blank
                     for (int m = 1; m < 20; m++){
-                        token[m] = strtok(0, " "); //subsequent tokens
+                        token[m] = strtok(0, "\t "); //subsequent tokens
                         if (!token[m]) break; // no more tokens
                     }
                 }
