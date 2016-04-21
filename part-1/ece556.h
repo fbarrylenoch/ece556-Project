@@ -5,6 +5,7 @@
 #define ECE556_H
 
 #include <stdio.h>
+#include <time.h>
 #include <execinfo.h>
 #include <signal.h>
 #include <string.h>
@@ -136,6 +137,8 @@ int solveRouting(routingInst *rst);
  void handler(int sig);
 
  bool containsBlockage(routingInst *rst, point *p1, point *p2); 
+ 
+ int printRoutingInstince (routingInst *rst);
 
 #endif // ECE556_H
 

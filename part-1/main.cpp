@@ -27,6 +27,11 @@ int main(int argc, char **argv)
  		printf("ERROR: reading input file \n");
  		return 1;
  	}
+
+    //printf("we passed reading in the benchmark\n");
+
+    /// print benchmart
+    //status = printRoutingInstince(rst);
 	
  	/// run actual routing
  	status = solveRouting(rst);
@@ -45,10 +50,10 @@ int main(int argc, char **argv)
  	}
 
  	release(rst);
-    usleep(50000);
-    time(&curr_time);
-    seconds = difftime(curr_time, init_time);
-    printf("That took %.3f seconds", seconds);
+    //usleep(50000);
+    //time(&curr_time);
+    //seconds = difftime(curr_time, init_time);
+    //printf("That took %.3f seconds", seconds);
  	printf("\nDONE!\n\n");
  	return 0;
 }
