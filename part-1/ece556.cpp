@@ -587,11 +587,12 @@ int readBenchmark(const char *fileName, routingInst *rst){
             rst->numEdges = y*(x-1) + x*(y-1);
             rst->edgeCaps = (int *)malloc(rst->numEdges * sizeof(int));
             rst->edgeUtils = (int *)malloc(rst->numEdges * sizeof(int));
-            // going to set edgeUtils to 0 as a default and 1 if the edge is utilized
+            // going to set edgeUtils to 0 as a default
             for (int i = 0; i < rst->numEdges; i++) {
                 rst->edgeUtils[i] = 0;
             }
         }
+        cout << "completed grid construction\n";
         // check for edge caps
         else if(strncmp(token[0], "capacity",64) == 0){
             //printf("check for edge caps\n");
