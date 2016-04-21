@@ -579,6 +579,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
         // check for grid size
         if(strncmp(token[0], "grid", 64) == 0){
             //printf("check for grid size\n");
+            cout << "grid construction began\n";
             int x = atoi(token[1]);
             int y = atoi(token[2]);
 
@@ -591,8 +592,8 @@ int readBenchmark(const char *fileName, routingInst *rst){
             for (int i = 0; i < rst->numEdges; i++) {
                 rst->edgeUtils[i] = 0;
             }
+            cout << "completed grid construction\n";
         }
-        cout << "completed grid construction\n";
         // check for edge caps
         else if(strncmp(token[0], "capacity",64) == 0){
             //printf("check for edge caps\n");
