@@ -690,6 +690,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 delete p1;
                 delete p2;
             }
+            cout << "leaving last else\n";
         }
     }
     cout << "completed readBenchmark\n";
