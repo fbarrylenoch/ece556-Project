@@ -667,7 +667,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
             for(int i = 0; i < num; i++){
                 cout << "num: " << num << " i: " << i <<"\n";
                 fin.getline(buf, 512);
-                cout << "stored all blockages in buffer\n";
                 // parse the line into blank-delimited tokens
                 token[0] = strtok(buf, "\t "); // subsequent tokens
                 if(token[0]){ // zerof if line is blank
@@ -680,18 +679,22 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 int *index;
                 point* p1 = new point;
                 point* p2 = new point;
+                cout << "temporary points created\n";
                 p1->x = atoi(token[0]);
                 p1->y = atoi(token[1]);
                 p2->x = atoi(token[2]);
                 p2->y = atoi(token[3]);
+                cout << "temporary points assigned\n";
                 int updatedCap = atoi(token[4]);
                 //printf("\tblockage: %d\n", i);
                 //printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
                 //        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
+                cout << "index: " << index << "\n";
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
+                cout << "\n";
             }
             cout << "completed blockage creation\n";
         }
