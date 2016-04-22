@@ -8,6 +8,8 @@
 #include <time.h>
 #include <execinfo.h>
 #include <signal.h>
+#include <algorithm>
+using std::max;
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -87,6 +89,8 @@ using std::endl;
    int numEdges ; 	/* number of edges of the grid */
    int *edgeCaps; 	/* array of the actual edge capacities after considering for blockages */
    int *edgeUtils;	/* array of edge utilizations */  
+   int *edgeWeight; /* array of edge weights */
+   int *edgeHis;    /* array of the history of each edge */
    int horizontalIndexes; /* number of horizontal edges in the grid */
    
   } routingInst ;
@@ -139,6 +143,9 @@ int solveRouting(routingInst *rst);
  bool containsBlockage(routingInst *rst, point *p1, point *p2); 
  
  int printRoutingInstince (routingInst *rst);
+ 
+ int calcEdgeWeights(int mode, route *newRoute, routingInst *rst);
+
 
 #endif // ECE556_H
 

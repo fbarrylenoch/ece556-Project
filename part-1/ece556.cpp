@@ -587,6 +587,8 @@ int readBenchmark(const char *fileName, routingInst *rst){
             rst->numEdges = y*(x-1) + x*(y-1);
             rst->edgeCaps = (int *)malloc(rst->numEdges * sizeof(int));
             rst->edgeUtils = (int *)malloc(rst->numEdges * sizeof(int));
+            rst->edgeWeight = (int *) malloc(rst->numEdges * sizeof(int));
+            rst->edgeHis = (int *) malloc(rst->numEdges * sizeof(int));
             // going to set edgeUtils to 0 as a default and 1 if the edge is utilized
             for (int i = 0; i < rst->numEdges; i++) {
                 rst->edgeUtils[i] = 0;
@@ -799,6 +801,35 @@ int solveRouting(routingInst *rst){
     cout << "Total Overflow: " << TOF << "\n";
     cout << "Total Wire Length: " << TWL << "\n";
     return 1;
+}
+
+int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
+
+    int Overflow;
+    // calculate all edge weights at the beginning
+    if(mode == 0){
+        for(int i = 0; i < rst->numEdges; ++i){
+            Overflow = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
+            rst->edgeHis[i] = 0;
+            if(Overflow > 0)
+                rst->edgeHis[i] += 1;
+            rst->edgeWeight[i] = Overflow * rst->edgeHis[i];
+            //printf("%d, ", rst->edgeWeight[i]);
+        }
+
+        cout << endl;
+        return 1;
+    }
+
+    else if(mode == 1){
+
+        return 1;
+    }
+    else if(mode == 2){
+
+        return 1;
+    }
+    return 0;
 }
 
 int writeOutput(const char *outRouteFile, routingInst *rst){
