@@ -585,6 +585,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
 
             rst->gx = x;
             rst->gy = y;
+            cout << "xValue: " << x << "\nyValue: " << y << "\n";
             rst->numEdges = y*(x-1) + x*(y-1);
             rst->edgeCaps = (int *)malloc(rst->numEdges * sizeof(int));
             rst->edgeUtils = (int *)malloc(rst->numEdges * sizeof(int));
@@ -597,19 +598,22 @@ int readBenchmark(const char *fileName, routingInst *rst){
         // check for edge caps
         else if(strncmp(token[0], "capacity",64) == 0){
             //printf("check for edge caps\n");
+            cout << "assigning edge caps\n";
             rst->cap = atoi(token[1]);
             for (int i = 0; i < rst->numEdges; i++) 
                 rst->edgeCaps[i] = rst->cap;
+            cout << "completed edgeCaps\n";
         }
         // check for number of nets
         else if(strncmp(token[0], "num", 64) == 0){
             //printf("check for number of nets\n");
+            cout << "assigning number of nets\n";
             rst->numNets = atoi(token[2]);
             rst->nets = (net *)malloc(rst->numNets*sizeof(net));
         }
         // check for nets
         else if(strcmp(token[0], "n0") == 0){
-            //printf("we are reading in nets\n");
+            cout << "begin reading in nets\n";
             for(int i = 0; i < rst->numNets; i++){
                 int num = atoi(token[1]);
                 net *tempNet = new net;
@@ -686,6 +690,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
             }
         }
     }
+    cout << "completed readBenchmark\n";
     return 1;
 }
 
