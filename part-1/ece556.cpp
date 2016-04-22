@@ -690,7 +690,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 //printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
                 //        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
-                cout << "index: " << index << "\n";
+                cout << "index: " << index[0] << "\n";
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
