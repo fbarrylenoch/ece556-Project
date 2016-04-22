@@ -658,8 +658,10 @@ int readBenchmark(const char *fileName, routingInst *rst){
                     }
                 }
             }
+            cout << "finished reading in nets\n";
         }
         else{
+            cout << "entered last else\n";
             int num = atoi(token[0]);
             //printf("starting blockage constraints, there are %d blockages\n", num);
             for(int i = 0; i < num; i++){
