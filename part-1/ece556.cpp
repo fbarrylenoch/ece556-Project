@@ -661,11 +661,13 @@ int readBenchmark(const char *fileName, routingInst *rst){
             cout << "finished reading in nets\n";
         }
         else{
-            cout << "entered last else\n";
+            cout << "entered blockage creation\n";
             int num = atoi(token[0]);
             //printf("starting blockage constraints, there are %d blockages\n", num);
             for(int i = 0; i < num; i++){
+                cout << "num: " << num << " i: " << i <<"\n";
                 fin.getline(buf, 512);
+                cout << "stored all blockages in buffer\n";
                 // parse the line into blank-delimited tokens
                 token[0] = strtok(buf, "\t "); // subsequent tokens
                 if(token[0]){ // zerof if line is blank
@@ -674,6 +676,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                         if (!token[m]) break; // no more tokens
                     }
                 }
+                cout << "assign blockages\n";
                 int *index;
                 point* p1 = new point;
                 point* p2 = new point;
@@ -690,7 +693,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 delete p1;
                 delete p2;
             }
-            cout << "leaving last else\n";
+            cout << "completed blockage creation\n";
         }
     }
     cout << "completed readBenchmark\n";
