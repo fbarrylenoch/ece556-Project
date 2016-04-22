@@ -579,13 +579,11 @@ int readBenchmark(const char *fileName, routingInst *rst){
         // check for grid size
         if(strncmp(token[0], "grid", 64) == 0){
             //printf("check for grid size\n");
-            cout << "grid construction began\n";
             int x = atoi(token[1]);
             int y = atoi(token[2]);
 
             rst->gx = x;
             rst->gy = y;
-            cout << "xValue: " << x << "\nyValue: " << y << "\n";
             rst->numEdges = y*(x-1) + x*(y-1);
             rst->edgeCaps = (int *)malloc(rst->numEdges * sizeof(int));
             rst->edgeUtils = (int *)malloc(rst->numEdges * sizeof(int));
@@ -595,27 +593,23 @@ int readBenchmark(const char *fileName, routingInst *rst){
             for (int i = 0; i < rst->numEdges; i++) {
                 rst->edgeUtils[i] = 0;
             }
-            cout << "completed grid construction\n";
         }
         // check for edge caps
         else if(strncmp(token[0], "capacity",64) == 0){
             //printf("check for edge caps\n");
-            cout << "assigning edge caps\n";
             rst->cap = atoi(token[1]);
             for (int i = 0; i < rst->numEdges; i++) 
                 rst->edgeCaps[i] = rst->cap;
-            cout << "completed edgeCaps\n";
         }
         // check for number of nets
         else if(strncmp(token[0], "num", 64) == 0){
             //printf("check for number of nets\n");
-            cout << "assigning number of nets\n";
             rst->numNets = atoi(token[2]);
             rst->nets = (net *)malloc(rst->numNets*sizeof(net));
         }
         // check for nets
         else if(strcmp(token[0], "n0") == 0){
-            cout << "begin reading in nets\n";
+            //printf("we are reading in nets\n");
             for(int i = 0; i < rst->numNets; i++){
                 int num = atoi(token[1]);
                 net *tempNet = new net;
@@ -660,14 +654,11 @@ int readBenchmark(const char *fileName, routingInst *rst){
                     }
                 }
             }
-            cout << "finished reading in nets\n";
         }
         else{
-            cout << "entered blockage creation\n";
             int num = atoi(token[0]);
             //printf("starting blockage constraints, there are %d blockages\n", num);
             for(int i = 0; i < num; i++){
-                cout << "num: " << num << " i: " << i <<"\n";
                 fin.getline(buf, 512);
                 // parse the line into blank-delimited tokens
                 token[0] = strtok(buf, "\t "); // subsequent tokens
@@ -677,36 +668,28 @@ int readBenchmark(const char *fileName, routingInst *rst){
                         if (!token[m]) break; // no more tokens
                     }
                 }
-                cout << "assign blockages\n";
                 int *index;
                 point* p1 = new point;
                 point* p2 = new point;
-                cout << "temporary points created\n";
                 p1->x = atoi(token[0]);
                 p1->y = atoi(token[1]);
                 p2->x = atoi(token[2]);
                 p2->y = atoi(token[3]);
-                cout << "temporary points assigned\n";
                 int updatedCap = atoi(token[4]);
                 //printf("\tblockage: %d\n", i);
                 //printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
                 //        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
-                cout << "index: " << index[0] << "\n";
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
-                cout << "\n";
             }
-            cout << "completed blockage creation\n";
         }
     }
-    cout << "completed readBenchmark\n";
     return 1;
 }
 
 int solveRouting(routingInst *rst){
-    cout << "entered solveRouting\n";
     //get every net in rst
     int TOF = 0; // temporarily being used to calculate total overflow
     int TWL = 0; // temporarily being used to calculate total wire length
