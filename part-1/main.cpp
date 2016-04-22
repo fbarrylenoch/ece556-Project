@@ -44,6 +44,12 @@ int main(int argc, char **argv)
     
 //    status = calcEdgeWeights();
     status = calcEdgeWeights(0, NULL, rst);
+    if(status == 0){
+        fprintf(stderr, "ERROR: caclulating edge weights");
+        release(rst);
+        return 1;
+    }
+    
  	/// write the result
  	status = writeOutput(outputFileName, rst);
  	if(status==0){
