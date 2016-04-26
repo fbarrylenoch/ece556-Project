@@ -1203,6 +1203,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
+                printf("end of for loop\n");
             }
         }
     }
