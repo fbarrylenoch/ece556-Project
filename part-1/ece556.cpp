@@ -132,13 +132,13 @@ void RRR(routingInst *rst, net *netRRR){
         // try Rotated Z shape
         routeRZ = shapeRZ(p1,p2,rst);
         // try U shape
-        //routeU = shareU(p1,p2,rst);
+        routeU = shapeU(p1,p2,rst);
         // try Rotated U shape
-        //routeRU = shareRU(p1,p2,rst);
+        routeRU = shapeRU(p1,p2,rst);
         // try C shape
-        //routeC = shareC(p1,p2,rst);
+        routeC = shapeC(p1,p2,rst);
         // try Rotated C shape
-        //routeRC = shareRC(p1,p2,rst);
+        routeRC = shapeRC(p1,p2,rst);
         // compare each attempt, take best option
 
     // recalculate edgeWeight after Net has been rerouted
@@ -158,6 +158,7 @@ route shapeL(point p1, point p2, routingInst *rst){
     point topP; /* used to calculate route */
     point bottomP; /* used to calculate route */
     point midPoint; /* used to calculate route */
+    int routeComp_weight, routeL_weight;
     
     /* check if straight line, assign routeL if so */
     if (p1.x == p2.x || p1.y == p2.y) {
@@ -253,6 +254,10 @@ route shapeL(point p1, point p2, routingInst *rst){
         segComp->edges = (int *)malloc(segComp->numEdges*sizeof(int));
         segComp->edges = edgesComp;
 
+        routeComp_weight = calcRouteCost(&routeComp, rst); 
+        routeL_weight = calcRouteCost(&routeL, rst);
+        if (routeComp_weight < routeL_weight)
+            routeL = routeComp;
         /* compare and take route with lowest weight */
         // need edge weight to be completed before this can be completed
     }
@@ -269,6 +274,7 @@ route shapeZ(point p1, point p2, routingInst *rst){
     point topMidPoint; /* used to calculate route */
     point bottomMidPoint; /* used to calculate route */
     int multiplier; /* used to get proper dirction for route generation */
+    int routeComp_weight, routeZ_weight; 
 
     // call shapeL if too close
     if (abs(p1.x - p2.x) < 2) {
@@ -375,11 +381,10 @@ route shapeZ(point p1, point p2, routingInst *rst){
             segComp->edges = edgesComp;
 
             // check if weight is lower than routeZ, assign to routeZ if true
-            /* 
-            if (routeComp_weight < routeZ_weight){
+            routeComp_weight = calcRouteCost(&routeComp, rst); 
+            routeZ_weight = calcRouteCost(&routeZ, rst);
+            if (routeComp_weight < routeZ_weight)
                 routeZ = routeComp;
-            }
-            */
         }
     }
     // return the route
@@ -395,6 +400,7 @@ route shapeRZ(point p1, point p2, routingInst *rst){
     point leftPoint; /* used to calculate route */
     point rightPoint; /* used to calculate route */
     int multiplier; /* used to get proper direction for route generation */
+    int routeComp_weight, routeRZ_weight;
 
 
     // call shapeL if too close
@@ -501,11 +507,10 @@ route shapeRZ(point p1, point p2, routingInst *rst){
             segComp->edges = edgesComp;
 
             // check if weight is lower than routeRZ, assign to routeRZ if true
-            /* 
-            if (routeComp_weight < routeRZ_weight){
+            routeComp_weight = calcRouteCost(&routeComp, rst); 
+            routeRZ_weight = calcRouteCost(&routeRZ, rst);
+            if (routeComp_weight < routeRZ_weight)
                 routeRZ = routeComp;
-            }
-            */
         }
     }
     // return the route
@@ -522,6 +527,7 @@ route shapeU(point p1, point p2, routingInst *rst){
     point rightPoint;
     point leftMidPoint;
     point rightMidPoint;
+    int routeComp_weight, routeU_weight;
     
      // return empty route if same x values
     if (p1.x == p2.x){
@@ -635,11 +641,10 @@ route shapeU(point p1, point p2, routingInst *rst){
                 segComp->edges = edgesComp;
 
                 // check if weight is lower than routeRZ, assign to routeRZ if true
-                /* 
-                if (routeComp_weight < routeRZ_weight){
-                    routeRZ = routeComp;
-                }
-                */
+                routeComp_weight = calcRouteCost(&routeComp, rst); 
+                routeU_weight = calcRouteCost(&routeU, rst);
+                if (routeComp_weight < routeU_weight)
+                    routeU = routeComp;
             }
         }
         // return the route
@@ -657,6 +662,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
     point rightPoint;
     point leftMidPoint;
     point rightMidPoint;
+    int routeComp_weight, routeRU_weight;
     
      // return empty route if same x values
     if (p1.x == p2.x){
@@ -770,11 +776,10 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 segComp->edges = edgesComp;
 
                 // check if weight is lower than routeRZ, assign to routeRZ if true
-                /* 
-                if (routeComp_weight < routeRZ_weight){
-                    routeRZ = routeComp;
-                }
-                */
+                routeComp_weight = calcRouteCost(&routeComp, rst); 
+                routeRU_weight = calcRouteCost(&routeRU, rst);
+                if (routeComp_weight < routeRU_weight)
+                    routeRU = routeComp;
             }
         }
         // return the route
@@ -792,6 +797,7 @@ route shapeC(point p1, point p2, routingInst *rst){
     point rightPoint;
     point topMidPoint;
     point bottomMidPoint;
+    int routeComp_weight, routeC_weight;
     
      // return empty route if same y values
     if (p1.y == p2.y){
@@ -905,11 +911,10 @@ route shapeC(point p1, point p2, routingInst *rst){
                 segComp->edges = edgesComp;
 
                 // check if weight is lower than routeC, assign to routeC if true
-                /* 
-                if (routeComp_weight < routeC_weight){
+                routeComp_weight = calcRouteCost(&routeComp, rst); 
+                routeC_weight = calcRouteCost(&routeC, rst);
+                if (routeComp_weight < routeC_weight)
                     routeC = routeComp;
-                }
-                */
             }
         }
         // return the route
@@ -927,6 +932,7 @@ route shapeRC(point p1, point p2, routingInst *rst){
     point rightPoint;
     point topMidPoint;
     point bottomMidPoint;
+    int routeComp_weight, routeRC_weight;
     
      // return empty route if same y values
     if (p1.y == p2.y){
@@ -1040,11 +1046,10 @@ route shapeRC(point p1, point p2, routingInst *rst){
                 segComp->edges = edgesComp;
 
                 // check if weight is lower than routeRC, assign to routeRC if true
-                /* 
-                if (routeComp_weight < routeRC_weight){
+                routeComp_weight = calcRouteCost(&routeComp, rst); 
+                routeRC_weight = calcRouteCost(&routeRC, rst);
+                if (routeComp_weight < routeRC_weight)
                     routeRC = routeComp;
-                }
-                */
             }
         }
         // return the route

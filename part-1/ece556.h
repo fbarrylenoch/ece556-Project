@@ -162,13 +162,13 @@ int solveRouting(routingInst *rst);
  // try Rotated Z shape
  route shapeRZ(point p1, point p2, routingInst *rst);
  // try U shape
- route shareU(point p1, point p2, routingInst *rst);
+ route shapeU(point p1, point p2, routingInst *rst);
  // try Rotated U shape
- route shareRU(point p1, point p2, routingInst *rst);
+ route shapeRU(point p1, point p2, routingInst *rst);
  // try C shape
- route shareC(point p1, point p2, routingInst *rst);
+ route shapeC(point p1, point p2, routingInst *rst);
  // try Rotated C shape
- route shareRC(point p1, point p2, routingInst *rst);
+ route shapeRC(point p1, point p2, routingInst *rst);
 
 #endif // ECE556_H
 
