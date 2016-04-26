@@ -6,7 +6,6 @@ int* getIndex(point p1, point p2, routingInst *rst){
     index = (int *)malloc(sizeof(int));
     index[0] = -1;
 
-    printf("getting index...\n");
     // check if horizontal line
     if (p1.y == p2.y) {
         // calculate index in rst->edgeCaps
@@ -48,7 +47,7 @@ int* getIndex(point p1, point p2, routingInst *rst){
             delete index;
             //printf("\t\t5) distance = %d\n", distance);
             index = (int *)malloc(sizeof(int));
-            index[0] = (rst->gy)*(rst->gx-1) + rst->gy*p1.y + p1.x;
+            index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x;
         }
         else if ((p1.y-p2.y) < -1) {
             distance = abs(p1.y-p2.y);
@@ -56,14 +55,14 @@ int* getIndex(point p1, point p2, routingInst *rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                index[i] = (rst->gy)*(rst->gx-1) + rst->gy*(p1.y + i) + p1.x;
+                index[i] = (rst->gy)*(rst->gx-1) + rst->gx*(p1.y + i) + p1.x;
             }
         }
         else if ((p1.y-p2.y) == 1) {
             delete index;
             //printf("\t\t7) distance = %d\n", distance);
             index = (int *)malloc(sizeof(int));
-            index[0] = (rst->gy)*(rst->gx-1) + rst->gy*p2.y + p1.x;
+            index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x;
         }
         else {
             distance = abs(p1.y-p2.y);
@@ -71,11 +70,10 @@ int* getIndex(point p1, point p2, routingInst *rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                index[i] = (rst->gy)*(rst->gx-1) + rst->gy*(p2.y + i) + p1.x;
+                index[i] = (rst->gy)*(rst->gx-1) + rst->gx*(p2.y + i) + p1.x;
             }
         } // case where p1.y-p2.y > 1
     }
-    printf("returning index...\n");
     return index;
 }
 
@@ -1202,10 +1200,8 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 index = getIndex(*p1, *p2, rst);
                 printf("updating edgeCaps at: %d...\n", index[0]);
                 rst->edgeCaps[index[0]] = updatedCap;
-                printf("deleting points...\n");
                 delete p1;
                 delete p2;
-                printf("end of for loop\n");
             }
         }
     }
