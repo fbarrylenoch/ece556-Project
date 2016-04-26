@@ -66,8 +66,9 @@ using std::endl;
   typedef struct
   {
 
-   int id ; 		/* ID of the net */
+   int id ; 		    /* ID of the net */
    int numPins ; 		/* number of pins (or terminals) of the net */
+   int cost;            /* the sum of all edge weights in the route */
    point *pins ; 		/* array of pins (or terminals) of the net. */
    route nroute ;		/* stored route for the net. */
 
@@ -84,12 +85,13 @@ using std::endl;
    int cap ;
    
    int numNets ;	/* number of nets */
-   net *nets ;		/* array of nets */
+   net *nets ;		/* array of nets {===> or we could use a vector of nets here <=== }*/ 
    
    int numEdges ; 	/* number of edges of the grid */
    int *edgeCaps; 	/* array of the actual edge capacities after considering for blockages */
    int *edgeUtils;	/* array of edge utilizations */  
    int *edgeWeight; /* array of edge weights */
+   int *edgeOver;   /* array of overflow of each edge*/
    int *edgeHis;    /* array of the history of each edge */
    int horizontalIndexes; /* number of horizontal edges in the grid */
    
@@ -139,6 +141,8 @@ int solveRouting(routingInst *rst);
  int release(routingInst *rst);
 
  void handler(int sig);
+
+ bool compare (const net &n1, const net &n2);
 
  bool containsBlockage(routingInst *rst, point *p1, point *p2); 
  

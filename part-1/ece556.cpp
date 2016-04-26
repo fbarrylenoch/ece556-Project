@@ -803,6 +803,10 @@ void handler(int sig) {
     exit(1);
 }
 
+bool compare (const net &n1, const net &n2){
+    return n1.cost > n2.cost;
+}
+
 int readBenchmark(const char *fileName, routingInst *rst){
     ifstream fin;
     fin.open(fileName);
@@ -842,6 +846,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
             rst->edgeCaps = (int *)malloc(rst->numEdges * sizeof(int));
             rst->edgeUtils = (int *)malloc(rst->numEdges * sizeof(int));
             rst->edgeWeight = (int *) malloc(rst->numEdges * sizeof(int));
+            rst->edgeOver = (int *) malloc(rst->numEdges * sizeof(int));
             rst->edgeHis = (int *) malloc(rst->numEdges * sizeof(int));
             // going to set edgeUtils to 0 as a default and 1 if the edge is utilized
             for (int i = 0; i < rst->numEdges; i++) {
@@ -974,7 +979,7 @@ int solveRouting(routingInst *rst){
                 tempSeg->edges = tempEdges;
 
                 for (int i = 0; i < tempSeg->numEdges; i++){
-                    rst->edgeCaps[tempSeg->edges[i]]--;
+                    //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
 
@@ -1007,7 +1012,7 @@ int solveRouting(routingInst *rst){
                 tempSeg->edges = tempEdges;
 
                 for (int i = 0; i < tempSeg->numEdges; i++){
-                    rst->edgeCaps[tempSeg->edges[i]]--;
+                    //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
 
@@ -1031,7 +1036,7 @@ int solveRouting(routingInst *rst){
                 tempSeg->edges = tempEdges;
 
                 for (int i = 0; i < tempSeg->numEdges; i++){
-                    rst->edgeCaps[tempSeg->edges[i]]--;
+                    //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
 
@@ -1052,22 +1057,20 @@ int solveRouting(routingInst *rst){
         if (rst->edgeUtils[i] > 0)
             TWL = TWL + rst->edgeUtils[i];
     }
-    cout << "Total Overflow: " << TOF << "\n";
-    cout << "Total Wire Length: " << TWL << "\n";
+    cout << "Total Overflow: " << TOF << endl;
+    cout << "Total Wire Length: " << TWL << endl;
     return 1;
 }
 
 int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
 
-    int Overflow;
+    int* indecies;
     // calculate all edge weights at the beginning
     if(mode == 0){
         for(int i = 0; i < rst->numEdges; ++i){
-            Overflow = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
             rst->edgeHis[i] = 0;
-            if(Overflow > 0)
-                rst->edgeHis[i] += 1;
-            rst->edgeWeight[i] = Overflow * rst->edgeHis[i];
+            rst->edgeOver[i] = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
+            rst->edgeWeight[i] = rst->edgeOver[i] * rst->edgeHis[i];
             //printf("%d, ", rst->edgeWeight[i]);
         }
 
@@ -1077,16 +1080,36 @@ int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
 
     else if(mode == 1){
         //segments
-            //number edges per segment
-                //get index based on points in each segment
-
-        return 1;
-    }
-    else if(mode == 2){
+        for(int i = 0; i < newRoute->numSegs; ++i){
+            indecies = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst);
+            for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
+                if(rst->edgeOver[indecies[j]] > 0)
+                    rst->edgeHis[indecies[j]] += 1;
+                rst->edgeOver[indecies[j]] = max((rst->edgeUtils[indecies[j]] 
+                            - rst->edgeCaps[indecies[j]]), 0);
+                rst->edgeWeight[indecies[j]] = rst->edgeOver[indecies[j]] * 
+                                               rst->edgeHis[indecies[j]];
+            }
+        }
 
         return 1;
     }
     return 0;
+}
+
+int calcNetCost(routingInst *rst){
+    int* indecies;
+    // calc cost
+    for(int i = 0; i < rst->numNets; ++i){
+        for(int j = 0; j < rst->nets[i].nroute.numSegs; ++j){
+            indecies = getIndex(rst->nets[i].nroute.segments[j].p1, rst->nets[i].nroute.segments[j].p2, rst);
+            for(int k = 0; k < rst->nets[i].nroute.segments[j].numEdges; ++k){
+                rst->nets[i].cost += rst->edgeWeight[indecies[k]];
+            }
+        }
+    }
+    //sort nets
+    return 1;
 }
 
 int writeOutput(const char *outRouteFile, routingInst *rst){
