@@ -1200,7 +1200,9 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
                         i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
+                printf("updating edgeCaps at index...\n");
                 rst->edgeCaps[index[0]] = updatedCap;
+                printf("deleting points...\n");
                 delete p1;
                 delete p2;
                 printf("end of for loop\n");
