@@ -47,7 +47,7 @@ int* getIndex(point p1, point p2, routingInst *rst){
             delete index;
             //printf("\t\t5) distance = %d\n", distance);
             index = (int *)malloc(sizeof(int));
-            index[0] = (rst->gy)*(rst->gx-1) + rst->gy*p1.y + p1.x;
+            index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x;
         }
         else if ((p1.y-p2.y) < -1) {
             distance = abs(p1.y-p2.y);
@@ -55,14 +55,14 @@ int* getIndex(point p1, point p2, routingInst *rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                index[i] = (rst->gy)*(rst->gx-1) + rst->gy*(p1.y + i) + p1.x;
+                index[i] = (rst->gy)*(rst->gx-1) + rst->gx*(p1.y + i) + p1.x;
             }
         }
         else if ((p1.y-p2.y) == 1) {
             delete index;
             //printf("\t\t7) distance = %d\n", distance);
             index = (int *)malloc(sizeof(int));
-            index[0] = (rst->gy)*(rst->gx-1) + rst->gy*p2.y + p1.x;
+            index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x;
         }
         else {
             distance = abs(p1.y-p2.y);
@@ -70,7 +70,7 @@ int* getIndex(point p1, point p2, routingInst *rst){
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
-                index[i] = (rst->gy)*(rst->gx-1) + rst->gy*(p2.y + i) + p1.x;
+                index[i] = (rst->gy)*(rst->gx-1) + rst->gx*(p2.y + i) + p1.x;
             }
         } // case where p1.y-p2.y > 1
     }
@@ -78,19 +78,21 @@ int* getIndex(point p1, point p2, routingInst *rst){
 }
 
 //will be called to rip up and reroute a net
-bool RRR(routingInst *rst, net *netRRR){
+void RRR(routingInst *rst, net *netRRR){
     int* indices;
     point p1;
     point p2;
     route routeRRR;
     segment *segRRR;
     
-    // routes for each shape attempt - not sure if I will use these
-    // route routeL; /* used to store the best L route option */
-    // route routeZ; /* used to store the best Z route option */
-    // route routeRZ; /* used to store the best Rotated Z route option */
-    // route routeU; /* used to store the best U route option */
-    // route routeC; /* used to store the best C route option */
+    // routes for each shape attempt
+    route routeL; /* used to store the best L route option */
+    route routeZ; /* used to store the best Z route option */
+    route routeRZ; /* used to store the best Rotated Z route option */
+    route routeU; /* used to store the best U route option */
+    route routeRU; /* used to store the best U route option */
+    route routeC; /* used to store the best U route option */
+    route routeRC; /* used to store the best C route option */
     
 
     routeRRR = netRRR->nroute;
@@ -113,41 +115,40 @@ bool RRR(routingInst *rst, net *netRRR){
 
     // call edgeWeight
 
-    // clear the segments of the route - not sure if this needs to be done
+    // clear the segments of the route
     routeRRR.numSegs = 0;
     delete routeRRR.segments;
 
     // reroute
     /* allocate enough memory for every connection from pin to pin to be the largest number of segments */
     routeRRR.segments = (segment *)malloc((netRRR->numPins-1)*3*sizeof(segment));
-     
+    
+    // loop for all pins
+
         // try L shape
-
+        routeL = shapeL(p1,p2,rst);
         // try Z shape 
-
+        routeZ = shapeZ(p1,p2,rst);
         // try Rotated Z shape
-
+        routeRZ = shapeRZ(p1,p2,rst);
         // try U shape
-
+        routeU = shareU(p1,p2,rst);
         // try Rotated U shape
-
+        routeRU = shareRU(p1,p2,rst);
         // try C shape
-
+        routeC = shareC(p1,p2,rst);
         // try Rotated C shape
-
+        routeRC = shareRC(p1,p2,rst);
         // compare each attempt, take best option
 
-
-    // recheck edgeWeight after Net has been rerouted
+    // recalculate edgeWeight after Net has been rerouted
 
     // get new net ordering
 
-    // return to top of function
+    // recall RRR function
 
 
-
-    // else return successful
-    return true;
+    return;
 }
 
 // returns best L shape route - return straight line if in line
@@ -1198,6 +1199,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 //printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
                 //        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
+                //printf("updating edgeCaps at: %d...\n", index[0]);
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
