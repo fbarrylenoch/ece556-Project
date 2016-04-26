@@ -106,12 +106,14 @@ bool RRR(routingInst *rst, net *netRRR){
 
         // update utilizations and weights for each edge
         for (int i = 0; i < segRRR->numEdges; i++){
-            rst->edgeCaps[segRRR->edges[i]]++;
+            //rst->edgeCaps[segRRR->edges[i]]++;
             rst->edgeUtils[segRRR->edges[i]]--;
         }
     }
 
-    // clear the segments of the route
+    // call edgeWeight
+
+    // clear the segments of the route - not sure if this needs to be done
     routeRRR.numSegs = 0;
     delete routeRRR.segments;
 
@@ -119,25 +121,30 @@ bool RRR(routingInst *rst, net *netRRR){
     /* allocate enough memory for every connection from pin to pin to be the largest number of segments */
     routeRRR.segments = (segment *)malloc((netRRR->numPins-1)*3*sizeof(segment));
      
-        // try L shape - maybe seperate method?
+        // try L shape
 
-        // try Z shape - maybe seperate method?
+        // try Z shape 
 
-        // try Rotated Z shape - maybe seperate method?
+        // try Rotated Z shape
 
-        // try U shape - maybe seperate method?
+        // try U shape
 
-        // try Rotated U shape - maybe seperate method?
+        // try Rotated U shape
 
-        // try C shape - maybe seperate method?
+        // try C shape
 
-        // try Rotated C shape - maybe seperate method?
+        // try Rotated C shape
 
         // compare each attempt, take best option
 
 
-    // if error for any reason, return false
-    /* return false; */
+    // recheck edgeWeight after Net has been rerouted
+
+    // get new net ordering
+
+    // return to top of function
+
+
 
     // else return successful
     return true;
