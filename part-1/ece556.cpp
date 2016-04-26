@@ -6,7 +6,7 @@ int* getIndex(point p1, point p2, routingInst *rst){
     index = (int *)malloc(sizeof(int));
     index[0] = -1;
 
-    cout << "getting index...\n";
+    printf("\tblockage: %d\n", i);
     // check if horizontal line
     if (p1.y == p2.y) {
         // calculate index in rst->edgeCaps
