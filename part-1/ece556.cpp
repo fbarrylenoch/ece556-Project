@@ -75,6 +75,7 @@ int* getIndex(point p1, point p2, routingInst *rst){
             }
         } // case where p1.y-p2.y > 1
     }
+    printf("returning index...\n");
     return index;
 }
 
