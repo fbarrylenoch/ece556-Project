@@ -78,19 +78,21 @@ int* getIndex(point p1, point p2, routingInst *rst){
 }
 
 //will be called to rip up and reroute a net
-bool RRR(routingInst *rst, net *netRRR){
+void RRR(routingInst *rst, net *netRRR){
     int* indices;
     point p1;
     point p2;
     route routeRRR;
     segment *segRRR;
     
-    // routes for each shape attempt - not sure if I will use these
-    // route routeL; /* used to store the best L route option */
-    // route routeZ; /* used to store the best Z route option */
-    // route routeRZ; /* used to store the best Rotated Z route option */
-    // route routeU; /* used to store the best U route option */
-    // route routeC; /* used to store the best C route option */
+    // routes for each shape attempt
+    route routeL; /* used to store the best L route option */
+    route routeZ; /* used to store the best Z route option */
+    route routeRZ; /* used to store the best Rotated Z route option */
+    route routeU; /* used to store the best U route option */
+    route routeRU; /* used to store the best U route option */
+    route routeC; /* used to store the best U route option */
+    route routeRC; /* used to store the best C route option */
     
 
     routeRRR = netRRR->nroute;
@@ -113,41 +115,40 @@ bool RRR(routingInst *rst, net *netRRR){
 
     // call edgeWeight
 
-    // clear the segments of the route - not sure if this needs to be done
+    // clear the segments of the route
     routeRRR.numSegs = 0;
     delete routeRRR.segments;
 
     // reroute
     /* allocate enough memory for every connection from pin to pin to be the largest number of segments */
     routeRRR.segments = (segment *)malloc((netRRR->numPins-1)*3*sizeof(segment));
-     
+    
+    // loop for all pins
+
         // try L shape
-
+        routeL = shapeL(p1,p2,rst);
         // try Z shape 
-
+        routeZ = shapeZ(p1,p2,rst);
         // try Rotated Z shape
-
+        routeRZ = shapeRZ(p1,p2,rst);
         // try U shape
-
+        routeU = shareU(p1,p2,rst);
         // try Rotated U shape
-
+        routeRU = shareRU(p1,p2,rst);
         // try C shape
-
+        routeC = shareC(p1,p2,rst);
         // try Rotated C shape
-
+        routeRC = shareRC(p1,p2,rst);
         // compare each attempt, take best option
 
-
-    // recheck edgeWeight after Net has been rerouted
+    // recalculate edgeWeight after Net has been rerouted
 
     // get new net ordering
 
-    // return to top of function
+    // recall RRR function
 
 
-
-    // else return successful
-    return true;
+    return;
 }
 
 // returns best L shape route - return straight line if in line
