@@ -1194,11 +1194,11 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 p2->x = atoi(token[2]);
                 p2->y = atoi(token[3]);
                 int updatedCap = atoi(token[4]);
-                printf("\tblockage: %d\n", i);
-                printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
-                        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
+                //printf("\tblockage: %d\n", i);
+                //printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
+                //        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
-                printf("updating edgeCaps at: %d...\n", index[0]);
+                //printf("updating edgeCaps at: %d...\n", index[0]);
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
