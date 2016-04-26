@@ -13,6 +13,7 @@ using std::max;
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <vector>
 
 #include <fstream>
 using std::ifstream;
@@ -85,7 +86,7 @@ using std::endl;
    int cap ;
    
    int numNets ;	/* number of nets */
-   net *nets ;		/* array of nets {===> or we could use a vector of nets here <=== }*/ 
+   std::vector<net> nets ;/* array of nets {===> or we could use a vector of nets here <=== }*/ 
    
    int numEdges ; 	/* number of edges of the grid */
    int *edgeCaps; 	/* array of the actual edge capacities after considering for blockages */
@@ -150,6 +151,7 @@ int solveRouting(routingInst *rst);
  
  int calcEdgeWeights(int mode, route *newRoute, routingInst *rst);
 
+ int calcNetCost(routingInst *rst);
 
 #endif // ECE556_H
 

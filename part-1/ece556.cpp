@@ -1123,7 +1123,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
         else if(strncmp(token[0], "num", 64) == 0){
             //printf("check for number of nets\n");
             rst->numNets = atoi(token[2]);
-            rst->nets = (net *)malloc(rst->numNets*sizeof(net));
+            //rst->nets = (net *)malloc(rst->numNets*sizeof(net));
         }
         // check for nets
         else if(strcmp(token[0], "n0") == 0){
@@ -1154,7 +1154,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                     tempNet->pins[j] = *tempPoint;
                     delete tempPoint;
                 }
-                rst->nets[i] = *tempNet;
+                rst->nets.push_back(*tempNet);
                 delete tempNet;
                 if(i < rst->numNets -1) {// get the new net
                     fin.getline(buf, 512);
@@ -1194,9 +1194,9 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 p2->x = atoi(token[2]);
                 p2->y = atoi(token[3]);
                 int updatedCap = atoi(token[4]);
-                printf("\tblockage: %d\n", i);
-                printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
-                        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
+                //printf("\tblockage: %d\n", i);
+                //printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
+                //        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
@@ -1212,7 +1212,7 @@ int solveRouting(routingInst *rst){
     int TOF = 0; // temporarily being used to calculate total overflow
     int TWL = 0; // temporarily being used to calculate total wire length
     for (int i = 0; i < rst->numNets; i++) {
-        net *tempNet = &(rst->nets[i]);
+        net *tempNet = &(rst->nets.at(i));
         tempNet->nroute.numSegs = 0;
 
         tempNet->nroute.segments = (segment *)malloc((tempNet->numPins-1)*2*sizeof(segment));
@@ -1316,8 +1316,8 @@ int solveRouting(routingInst *rst){
         if (rst->edgeUtils[i] > 0)
             TWL = TWL + rst->edgeUtils[i];
     }
-    cout << "Total Overflow: " << TOF << endl;
-    cout << "Total Wire Length: " << TWL << endl;
+    //cout << "Total Overflow: " << TOF << endl;
+    //cout << "Total Wire Length: " << TWL << endl;
     return 1;
 }
 
@@ -1326,14 +1326,17 @@ int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
     int* indecies;
     // calculate all edge weights at the beginning
     if(mode == 0){
+        printf("initializing edge weights\n");
         for(int i = 0; i < rst->numEdges; ++i){
             rst->edgeHis[i] = 0;
             rst->edgeOver[i] = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
+            if(rst->edgeOver[i] > 0)
+                rst->edgeHis[i] += 1;
             rst->edgeWeight[i] = rst->edgeOver[i] * rst->edgeHis[i];
-            //printf("%d, ", rst->edgeWeight[i]);
+            printf("%d, ", rst->edgeWeight[i]);
         }
 
-        cout << endl;
+        cout << endl << endl;
         return 1;
     }
 
@@ -1359,13 +1362,19 @@ int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
 int calcNetCost(routingInst *rst){
     int* indecies;
     // calc cost
+    // over all nets
     for(int i = 0; i < rst->numNets; ++i){
-        for(int j = 0; j < rst->nets[i].nroute.numSegs; ++j){
-            indecies = getIndex(rst->nets[i].nroute.segments[j].p1, rst->nets[i].nroute.segments[j].p2, rst);
-            for(int k = 0; k < rst->nets[i].nroute.segments[j].numEdges; ++k){
-                rst->nets[i].cost += rst->edgeWeight[indecies[k]];
+        rst->nets.at(i).cost = 0;
+        // over all segments in the route
+        for(int j = 0; j < rst->nets.at(i).nroute.numSegs; ++j){
+            indecies = getIndex(rst->nets.at(i).nroute.segments[j].p1, rst->nets.at(i).nroute.segments[j].p2, rst);
+            // over all edges in the segment
+            for(int k = 0; k < rst->nets.at(i).nroute.segments[j].numEdges; ++k){
+                rst->nets.at(i).cost += rst->edgeWeight[indecies[k]];
+                printf("\tthe cost is now %d\n", rst->nets.at(i).cost);
             }
         }
+        printf("the cost at net n%d = %d\n",i,rst->nets.at(i).cost);
     }
     //sort nets
     return 1;
@@ -1378,7 +1387,7 @@ int writeOutput(const char *outRouteFile, routingInst *rst){
 
         for (int i = 0; i < rst->numNets; i++) {
 
-            net tmpNet = rst->nets[i];
+            net tmpNet = rst->nets.at(i);
             route tmpRoute = tmpNet.nroute;
             output << "n" << tmpNet.id << "\n";
 
@@ -1398,10 +1407,10 @@ int writeOutput(const char *outRouteFile, routingInst *rst){
 
 int printRoutingInstince (routingInst *rst){
     for(int i = 0; i < rst->numNets; ++i){
-        printf("net n%d, has %d pins\n", i, rst->nets[i].numPins);
+        printf("net n%d, has %d pins\n", i, rst->nets.at(i).numPins);
        /* printf("the pin connections are:\n");
-        for(int j = 0; j < rst->nets[i].numPins; ++j){
-            printf("\t(%d,%d)\n", rst->nets[i].pins[j].x,rst->nets[i].pins[j].y);
+        for(int j = 0; j < rst->nets.at(i).numPins; ++j){
+            printf("\t(%d,%d)\n", rst->nets.at(i).pins[j].x,rst->nets.at(i).pins[j].y);
         }*/
     }
     return 1;
@@ -1411,7 +1420,7 @@ int printRoutingInstince (routingInst *rst){
 int release(routingInst *rst){
 	try {
         for (int i = 0; i < rst->numNets; i++) {
-            net deleteNet = rst->nets[i];
+            net deleteNet = rst->nets.at(i);
             delete deleteNet.nroute.segments;
             delete deleteNet.pins;
         }
