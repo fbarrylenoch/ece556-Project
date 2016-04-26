@@ -152,6 +152,23 @@ int solveRouting(routingInst *rst);
  int calcEdgeWeights(int mode, route *newRoute, routingInst *rst);
 
  int calcNetCost(routingInst *rst);
+ 
+ int calcRouteCost(route *newRoute, routingInst *rst);
+ 
+ // try L shape
+ route shapeL(point p1, point p2, routingInst *rst);
+ // try Z shape 
+ route shapeZ(point p1, point p2, routingInst *rst);
+ // try Rotated Z shape
+ route shapeRZ(point p1, point p2, routingInst *rst);
+ // try U shape
+ route shareU(point p1, point p2, routingInst *rst);
+ // try Rotated U shape
+ route shareRU(point p1, point p2, routingInst *rst);
+ // try C shape
+ route shareC(point p1, point p2, routingInst *rst);
+ // try Rotated C shape
+ route shareRC(point p1, point p2, routingInst *rst);
 
 #endif // ECE556_H
 

@@ -132,13 +132,13 @@ void RRR(routingInst *rst, net *netRRR){
         // try Rotated Z shape
         routeRZ = shapeRZ(p1,p2,rst);
         // try U shape
-        routeU = shareU(p1,p2,rst);
+        //routeU = shareU(p1,p2,rst);
         // try Rotated U shape
-        routeRU = shareRU(p1,p2,rst);
+        //routeRU = shareRU(p1,p2,rst);
         // try C shape
-        routeC = shareC(p1,p2,rst);
+        //routeC = shareC(p1,p2,rst);
         // try Rotated C shape
-        routeRC = shareRC(p1,p2,rst);
+        //routeRC = shareRC(p1,p2,rst);
         // compare each attempt, take best option
 
     // recalculate edgeWeight after Net has been rerouted
@@ -1328,17 +1328,17 @@ int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
     int* indecies;
     // calculate all edge weights at the beginning
     if(mode == 0){
-        printf("initializing edge weights\n");
+        //printf("initializing edge weights\n");
         for(int i = 0; i < rst->numEdges; ++i){
             rst->edgeHis[i] = 0;
             rst->edgeOver[i] = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
             if(rst->edgeOver[i] > 0)
                 rst->edgeHis[i] += 1;
             rst->edgeWeight[i] = rst->edgeOver[i] * rst->edgeHis[i];
-            printf("%d, ", rst->edgeWeight[i]);
+            //printf("%d, ", rst->edgeWeight[i]);
         }
 
-        cout << endl << endl;
+        //cout << endl << endl;
         return 1;
     }
 
@@ -1373,13 +1373,26 @@ int calcNetCost(routingInst *rst){
             // over all edges in the segment
             for(int k = 0; k < rst->nets.at(i).nroute.segments[j].numEdges; ++k){
                 rst->nets.at(i).cost += rst->edgeWeight[indecies[k]];
-                printf("\tthe cost is now %d\n", rst->nets.at(i).cost);
             }
         }
-        printf("the cost at net n%d = %d\n",i,rst->nets.at(i).cost);
     }
     //sort nets
+    sort(rst->nets.begin(), rst->nets.end(), compare);
     return 1;
+}
+
+int calcRouteCost(route *newRoute, routingInst *rst){
+    int cost, *indecies;
+    cost = 0;
+    // over all segments in the route
+    for(int i = 0; i < newRoute->numSegs; ++i){
+        indecies = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst);
+        // over all edges in the segment
+        for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
+            cost += rst->edgeWeight[indecies[j]];
+        }
+    }
+    return cost;
 }
 
 int writeOutput(const char *outRouteFile, routingInst *rst){
