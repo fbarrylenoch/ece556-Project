@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <algorithm>
 using std::max;
+using std::min;
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -154,6 +155,8 @@ int solveRouting(routingInst *rst);
  int calcNetCost(routingInst *rst);
  
  int calcRouteCost(route *newRoute, routingInst *rst);
+
+ void RRR(routingInst *rst, net *netRRR);
  
  // try L shape
  route shapeL(point p1, point p2, routingInst *rst);

@@ -93,7 +93,16 @@ void RRR(routingInst *rst, net *netRRR){
     route routeRU; /* used to store the best U route option */
     route routeC; /* used to store the best U route option */
     route routeRC; /* used to store the best C route option */
-    
+    route routeBest;
+    int routeL_weight,
+        routeZ_weight,
+        routeRZ_weight,
+        routeU_weight,
+        routeRU_weight,
+        routeC_weight,
+        routeRC_weight,
+        routeBest_weight;
+        
 
     routeRRR = netRRR->nroute;
     // rip up
@@ -108,13 +117,12 @@ void RRR(routingInst *rst, net *netRRR){
 
         // update utilizations and weights for each edge
         for (int i = 0; i < segRRR->numEdges; i++){
-            //rst->edgeCaps[segRRR->edges[i]]++;
             rst->edgeUtils[segRRR->edges[i]]--;
         }
     }
 
     // call edgeWeight
-
+    calcEdgeWeights(1,&routeRRR,rst);
     // clear the segments of the route
     routeRRR.numSegs = 0;
     delete routeRRR.segments;
@@ -124,7 +132,7 @@ void RRR(routingInst *rst, net *netRRR){
     routeRRR.segments = (segment *)malloc((netRRR->numPins-1)*3*sizeof(segment));
     
     // loop for all pins
-
+    for (int i = 0; i < (netRRR->numPins-1); i++) {
         // try L shape
         routeL = shapeL(p1,p2,rst);
         // try Z shape 
@@ -139,15 +147,50 @@ void RRR(routingInst *rst, net *netRRR){
         routeC = shapeC(p1,p2,rst);
         // try Rotated C shape
         routeRC = shapeRC(p1,p2,rst);
-        // compare each attempt, take best option
-
+        // get weights of each route
+        routeL_weight = calcRouteCost(&routeL, rst);
+        routeZ_weight = calcRouteCost(&routeZ, rst);
+        routeRZ_weight = calcRouteCost(&routeRZ, rst);
+        routeU_weight = calcRouteCost(&routeU, rst);
+        routeRU_weight = calcRouteCost(&routeRU, rst);
+        routeC_weight = calcRouteCost(&routeC, rst);
+        routeRC_weight = calcRouteCost(&routeRC, rst);
+        //compare weights and take lowest cost route
+        routeBest = routeL;
+        routeBest_weight = routeL_weight;
+        if (routeZ_weight < routeBest_weight) {
+            routeBest = routeZ;
+            routeBest_weight = routeZ_weight;
+        }
+        if (routeRZ_weight < routeBest_weight) {
+            routeBest = routeRZ;
+            routeBest_weight = routeRZ_weight;
+        }
+        if (routeU_weight < routeBest_weight) {
+            routeBest = routeU;
+            routeBest_weight = routeU_weight;
+        }
+        if (routeRU_weight < routeBest_weight) {
+            routeBest = routeRU;
+            routeBest_weight = routeRU_weight;
+        }
+        if (routeC_weight < routeBest_weight) {
+            routeBest = routeC;
+            routeBest_weight = routeC_weight;
+        }
+        if (routeRC_weight < routeBest_weight) {
+            routeBest = routeRC;
+            routeBest_weight = routeRC_weight;
+        }
+        // add to routeRRR_segments
+        for (int j = 0; j < routeBest.numSegs; j++) {
+            routeRRR.segments[routeRRR.numSegs + j] = routeBest.segments[j];
+            routeRRR.numSegs++;
+        }
+    }
+    netRRR->nroute = routeRRR;
     // recalculate edgeWeight after Net has been rerouted
-
-    // get new net ordering
-
-    // recall RRR function
-
-
+    calcEdgeWeights(1,&routeRRR,rst);
     return;
 }
 
