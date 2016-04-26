@@ -822,6 +822,9 @@ int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
     }
 
     else if(mode == 1){
+        //segments
+            //number edges per segment
+                //get index based on points in each segment
 
         return 1;
     }
