@@ -49,6 +49,13 @@ int main(int argc, char **argv)
         release(rst);
         return 1;
     }
+
+    status = calcNetCost(rst);
+    if(status == 0){
+        fprintf(stderr, "ERROR: caclulating edge weights");
+        release(rst);
+        return 1;
+    }
     
  	/// write the result
  	status = writeOutput(outputFileName, rst);
