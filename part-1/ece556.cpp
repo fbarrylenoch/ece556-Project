@@ -1393,6 +1393,8 @@ int RRR(routingInst *rst){
         calcNetCost(rst);
         //for(int i = 0; i < rst->numNets; ++i){
             printf("sending net n%d\n", rst->nets[0].id);
+            printf("net n%d has cost %d | n%d has cost %d", rst->nets.at(0).id, rst->nets.at(0).cost,
+                    rst->nets.at(1).id, rst->nets.at(1).cost);
             RRRnet(rst, &rst->nets[0]);
         //}
         time(&curr_time);
