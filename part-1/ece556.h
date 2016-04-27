@@ -123,14 +123,16 @@ using std::endl;
      output: 1 if successful, 0 otherwise (e.g. the data structures are not populated) 
   */
  int solveRouting(routingInst *rst);
+
+ int RRR(routingInst *rst);
  
- int calcEdgeWeights(int mode, route *newRoute, routingInst *rst);
+ int calcEdgeWeights(route *newRoute, routingInst *rst);
  
  int calcRouteCost(route *newRoute, routingInst *rst);
 
  int calcNetCost(routingInst *rst);
  
- void RRR(routingInst *rst, net *netRRR);
+ void RRRnet(routingInst *rst, net *netRRR);
 
  route shapeL(point p1, point p2, routingInst *rst);
  

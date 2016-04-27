@@ -78,12 +78,9 @@ int* getIndex(point p1, point p2, routingInst *rst){
 }
 
 //will be called to rip up and reroute a net
-void RRR(routingInst *rst, net *netRRR){
+void RRRnet(routingInst *rst, net *netRRR){
     int* indices;
-    point p1;
-    point p2;
     route routeRRR;
-    segment *segRRR;
     
     // routes for each shape attempt
     route routeL; /* used to store the best L route option */
@@ -106,23 +103,16 @@ void RRR(routingInst *rst, net *netRRR){
 
     routeRRR = netRRR->nroute;
     // rip up
-    for (int i = 0; i < routeRRR.numSegs; i++){ /* get each segment in the net*/
-        segRRR = &(routeRRR.segments[i]);
-
-        // assign endpoints of the segment
-        p1 = segRRR->p1;
-        p2 = segRRR->p2;
-
-        indices = getIndex(p1,p2,rst);  /* get the edge indices of the segment*/
-
-        // update utilizations and weights for each edge
-        for (int i = 0; i < segRRR->numEdges; i++){
-            rst->edgeUtils[segRRR->edges[i]]--;
-        }
+    // over all segments in the route
+    for(int i = 0; i < routeRRR.numSegs; ++i){
+        indices = getIndex(routeRRR.segments[i].p1, routeRRR.segments[i].p2, rst);
+        // over all edges in the segment
+        for(int j = 0; j < routeRRR.segments[i].numEdges; ++j)
+            rst->edgeUtils[indices[j]]--;
     }
 
     // call edgeWeight
-    calcEdgeWeights(1,&routeRRR,rst);
+    calcEdgeWeights(&routeRRR,rst);
     // clear the segments of the route
     routeRRR.numSegs = 0;
     delete routeRRR.segments;
@@ -134,63 +124,75 @@ void RRR(routingInst *rst, net *netRRR){
     // loop for all pins
     for (int i = 0; i < (netRRR->numPins-1); i++) {
         // try L shape
-        routeL = shapeL(p1,p2,rst);
+        routeL = shapeL(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try Z shape 
-        routeZ = shapeZ(p1,p2,rst);
+        routeZ = shapeZ(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try Rotated Z shape
-        routeRZ = shapeRZ(p1,p2,rst);
+        routeRZ = shapeRZ(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try U shape
-        routeU = shapeU(p1,p2,rst);
+        routeU = shapeU(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try Rotated U shape
-        routeRU = shapeRU(p1,p2,rst);
+        routeRU = shapeRU(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try C shape
-        routeC = shapeC(p1,p2,rst);
+        /*routeC = shapeC(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try Rotated C shape
-        routeRC = shapeRC(p1,p2,rst);
+        routeRC = shapeRC(netRRR->pins[i],netRRR->pins[i+1],rst);
+        */
+        
         // get weights of each route
         routeL_weight = calcRouteCost(&routeL, rst);
         routeZ_weight = calcRouteCost(&routeZ, rst);
         routeRZ_weight = calcRouteCost(&routeRZ, rst);
         routeU_weight = calcRouteCost(&routeU, rst);
         routeRU_weight = calcRouteCost(&routeRU, rst);
-        routeC_weight = calcRouteCost(&routeC, rst);
+        /*routeC_weight = calcRouteCost(&routeC, rst);
         routeRC_weight = calcRouteCost(&routeRC, rst);
+        */
+        
         //compare weights and take lowest cost route
         routeBest = routeL;
         routeBest_weight = routeL_weight;
+        //printf("\tfor pins %d - %d, L is the best\n",i,i+1);
         if (routeZ_weight < routeBest_weight) {
+            //printf("\tfor pins %d - %d, Z is the best\n",i,i+1);
             routeBest = routeZ;
             routeBest_weight = routeZ_weight;
         }
         if (routeRZ_weight < routeBest_weight) {
+            //printf("\tfor pins %d - %d, RZ is the best\n",i,i+1);
             routeBest = routeRZ;
             routeBest_weight = routeRZ_weight;
         }
         if (routeU_weight < routeBest_weight) {
+            //printf("\tfor pins %d - %d, U is the best\n",i,i+1);
             routeBest = routeU;
             routeBest_weight = routeU_weight;
         }
         if (routeRU_weight < routeBest_weight) {
+            //printf("\tfor pins %d - %d, RU is the best\n",i,i+1);
             routeBest = routeRU;
             routeBest_weight = routeRU_weight;
         }
-        if (routeC_weight < routeBest_weight) {
+        /*if (routeC_weight < routeBest_weight) {
+            printf("\tfor pins %d - %d, C is the best\n",i,i+1);
             routeBest = routeC;
             routeBest_weight = routeC_weight;
         }
         if (routeRC_weight < routeBest_weight) {
+            printf("\tfor pins %d - %d, RC is the best\n",netRRR->pins[i],netRRR->pins[i+1]);
             routeBest = routeRC;
             routeBest_weight = routeRC_weight;
-        }
+        }*/
         // add to routeRRR_segments
-        for (int j = 0; j < routeBest.numSegs; j++) {
+
+        for (int j = 0; j < routeBest.numSegs; j++)
             routeRRR.segments[routeRRR.numSegs + j] = routeBest.segments[j];
-            routeRRR.numSegs++;
-        }
+        routeRRR.numSegs += routeBest.numSegs;
     }
+    // print routeRRR
     netRRR->nroute = routeRRR;
     // recalculate edgeWeight after Net has been rerouted
-    calcEdgeWeights(1,&routeRRR,rst);
+    calcEdgeWeights(&routeRRR,rst);
     return;
 }
 
@@ -1358,6 +1360,16 @@ int solveRouting(routingInst *rst){
             }
         }
     }
+    // calculate all edge weights at the beginning
+    //printf("initializing edge weights\n");
+    for(int i = 0; i < rst->numEdges; ++i){
+        rst->edgeHis[i] = 0;
+        rst->edgeOver[i] = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
+        if(rst->edgeOver[i] > 0)
+            rst->edgeHis[i] += 1;
+        rst->edgeWeight[i] = rst->edgeOver[i] * rst->edgeHis[i];
+        //printf("%d, ", rst->edgeWeight[i]);
+    }
 
     // I am like 80% sure this works...
     for (int i = 0; i < rst->numEdges; i++){
@@ -1371,56 +1383,57 @@ int solveRouting(routingInst *rst){
     return 1;
 }
 
-int calcEdgeWeights(int mode, route *newRoute, routingInst *rst){
+int RRR(routingInst *rst){
+    time_t init_time, curr_time;
+    double seconds;
+    bool done = false;
 
-    int* indecies;
-    // calculate all edge weights at the beginning
-    if(mode == 0){
-        //printf("initializing edge weights\n");
-        for(int i = 0; i < rst->numEdges; ++i){
-            rst->edgeHis[i] = 0;
-            rst->edgeOver[i] = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
-            if(rst->edgeOver[i] > 0)
-                rst->edgeHis[i] += 1;
-            rst->edgeWeight[i] = rst->edgeOver[i] * rst->edgeHis[i];
-            //printf("%d, ", rst->edgeWeight[i]);
-        }
-
-        //cout << endl << endl;
-        return 1;
+    time(&init_time);
+    while(!done){
+        calcNetCost(rst);
+        //for(int i = 0; i < rst->numNets; ++i){
+            printf("sending net n%d\n", rst->nets[0].id);
+            RRRnet(rst, &rst->nets[0]);
+        //}
+        time(&curr_time);
+        seconds = difftime(curr_time, init_time);
+        printf("\tcurrent time %.2f\n", seconds);
+        if(seconds > 15)
+            done = true;
     }
+    printf("got out of the while loop\n");
+    return 1;
+}
 
-    else if(mode == 1){
-        //segments
-        for(int i = 0; i < newRoute->numSegs; ++i){
-            indecies = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst);
-            for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-                if(rst->edgeOver[indecies[j]] > 0)
-                    rst->edgeHis[indecies[j]] += 1;
-                rst->edgeOver[indecies[j]] = max((rst->edgeUtils[indecies[j]] 
-                            - rst->edgeCaps[indecies[j]]), 0);
-                rst->edgeWeight[indecies[j]] = rst->edgeOver[indecies[j]] * 
-                                               rst->edgeHis[indecies[j]];
-            }
+int calcEdgeWeights(route *newRoute, routingInst *rst){
+
+    int* indices;
+    for(int i = 0; i < newRoute->numSegs; ++i){
+        indices = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst);
+        for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
+            if(rst->edgeOver[indices[j]] > 0)
+                rst->edgeHis[indices[j]] += 1;
+            rst->edgeOver[indices[j]] = max((rst->edgeUtils[indices[j]] 
+                        - rst->edgeCaps[indices[j]]), 0);
+            rst->edgeWeight[indices[j]] = rst->edgeOver[indices[j]] * 
+                                           rst->edgeHis[indices[j]];
         }
-
-        return 1;
     }
-    return 0;
+    return 1;
 }
 
 int calcNetCost(routingInst *rst){
-    int* indecies;
+    int* indices;
     // calc cost
     // over all nets
     for(int i = 0; i < rst->numNets; ++i){
         rst->nets.at(i).cost = 0;
         // over all segments in the route
         for(int j = 0; j < rst->nets.at(i).nroute.numSegs; ++j){
-            indecies = getIndex(rst->nets.at(i).nroute.segments[j].p1, rst->nets.at(i).nroute.segments[j].p2, rst);
+            indices = getIndex(rst->nets.at(i).nroute.segments[j].p1, rst->nets.at(i).nroute.segments[j].p2, rst);
             // over all edges in the segment
             for(int k = 0; k < rst->nets.at(i).nroute.segments[j].numEdges; ++k){
-                rst->nets.at(i).cost += rst->edgeWeight[indecies[k]];
+                rst->nets.at(i).cost += rst->edgeWeight[indices[k]];
             }
         }
     }
@@ -1430,14 +1443,14 @@ int calcNetCost(routingInst *rst){
 }
 
 int calcRouteCost(route *newRoute, routingInst *rst){
-    int cost, *indecies;
+    int cost, *indices;
     cost = 0;
     // over all segments in the route
     for(int i = 0; i < newRoute->numSegs; ++i){
-        indecies = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst);
+        indices = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst);
         // over all edges in the segment
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            cost += rst->edgeWeight[indecies[j]];
+            cost += rst->edgeWeight[indices[j]];
         }
     }
     return cost;
@@ -1450,12 +1463,10 @@ int writeOutput(const char *outRouteFile, routingInst *rst){
 
         for (int i = 0; i < rst->numNets; i++) {
 
-            net tmpNet = rst->nets.at(i);
-            route tmpRoute = tmpNet.nroute;
-            output << "n" << tmpNet.id << "\n";
+            output << "n" << rst->nets.at(i).id << "\n";
 
-            for (int j = 0; j < tmpRoute.numSegs; j++) {
-                segment tmpSeg = tmpRoute.segments[j];
+            for (int j = 0; j < rst->nets.at(i).nroute.numSegs; j++) {
+                segment tmpSeg = rst->nets.at(i).nroute.segments[j];
                 output << "(" << tmpSeg.p1.x << "," << tmpSeg.p1.y << ")-(" << 
                     tmpSeg.p2.x << "," << tmpSeg.p2.y << ")\n";
             }
