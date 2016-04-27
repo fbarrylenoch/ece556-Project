@@ -100,24 +100,53 @@ using std::endl;
   } routingInst ;
   
 
-/* int readBenchmark(const char *fileName, routingInst *rst)
-   Read in the benchmark file and initialize the routing instance.
-   This function needs to populate all fields of the routingInst structure.
-   input1: fileName: Name of the benchmark input file
-   input2: pointer to the routing instance
-   output: 1 if successful
-*/
-int readBenchmark(const char *fileName, routingInst *rst);
+ void handler(int sig);
 
+ bool compare (const net &n1, const net &n2);
+
+  /* int readBenchmark(const char *fileName, routingInst *rst)
+     Read in the benchmark file and initialize the routing instance.
+     This function needs to populate all fields of the routingInst structure.
+     input1: fileName: Name of the benchmark input file
+     input2: pointer to the routing instance
+     output: 1 if successful
+  */
+ int readBenchmark(const char *fileName, routingInst *rst);
+
+ int* getIndex(point p1, point p2, routingInst *rst);
+
+ int printRoutingInstince (routingInst *rst);
   
-/* int solveRouting(routingInst *rst)
-   This function creates a routing solution
-   input: pointer to the routing instance
-   output: 1 if successful, 0 otherwise (e.g. the data structures are not populated) 
-*/
-int solveRouting(routingInst *rst);
+  /* int solveRouting(routingInst *rst)
+     This function creates a routing solution
+     input: pointer to the routing instance
+     output: 1 if successful, 0 otherwise (e.g. the data structures are not populated) 
+  */
+ int solveRouting(routingInst *rst);
+ 
+ int calcEdgeWeights(int mode, route *newRoute, routingInst *rst);
+ 
+ int calcRouteCost(route *newRoute, routingInst *rst);
+
+ int calcNetCost(routingInst *rst);
+ 
+ void RRR(routingInst *rst, net *netRRR);
+
+ route shapeL(point p1, point p2, routingInst *rst);
+ 
+ route shapeZ(point p1, point p2, routingInst *rst);
+
+ route shapeRZ(point p1, point p2, routingInst *rst);
+
+ route shapeU(point p1, point p2, routingInst *rst);
+
+ route shapeRU(point p1, point p2, routingInst *rst);
+
+ route shapeC(point p1, point p2, routingInst *rst);
+
+ route shapeRC(point p1, point p2, routingInst *rst);
   
-/* int writeOutput(const char *outRouteFile, routingInst *rst)
+  /* int writeOutput(const char *outRouteFile, routingInst *rst)
    Write the routing solution obtained from solveRouting(). 
    Refer to the project link for the required output format.
 
@@ -141,37 +170,6 @@ int solveRouting(routingInst *rst);
      output: 1 if successful, 0 otherwise 
   */
  int release(routingInst *rst);
-
- void handler(int sig);
-
- bool compare (const net &n1, const net &n2);
-
- bool containsBlockage(routingInst *rst, point *p1, point *p2); 
- 
- int printRoutingInstince (routingInst *rst);
- 
- int calcEdgeWeights(int mode, route *newRoute, routingInst *rst);
-
- int calcNetCost(routingInst *rst);
- 
- int calcRouteCost(route *newRoute, routingInst *rst);
-
- void RRR(routingInst *rst, net *netRRR);
- 
- // try L shape
- route shapeL(point p1, point p2, routingInst *rst);
- // try Z shape 
- route shapeZ(point p1, point p2, routingInst *rst);
- // try Rotated Z shape
- route shapeRZ(point p1, point p2, routingInst *rst);
- // try U shape
- route shapeU(point p1, point p2, routingInst *rst);
- // try Rotated U shape
- route shapeRU(point p1, point p2, routingInst *rst);
- // try C shape
- route shapeC(point p1, point p2, routingInst *rst);
- // try Rotated C shape
- route shapeRC(point p1, point p2, routingInst *rst);
 
 #endif // ECE556_H
 
