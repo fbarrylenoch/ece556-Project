@@ -10,14 +10,12 @@ int* getIndex(point p1, point p2, routingInst *rst){
     if (p1.y == p2.y) {
         // calculate index in rst->edgeCaps
         if ((p1.x-p2.x) == -1) {
-            //printf("\t\t1) distance = %d\n", distance);
             delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gx-1)*p1.y + p1.x;
         }
         else if((p1.x-p2.x) < -1) {
             distance = abs(p1.x-p2.x);
-            //printf("\t\t2) distance = %d\n", distance);
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
@@ -26,14 +24,12 @@ int* getIndex(point p1, point p2, routingInst *rst){
         }            
         else if((p1.x-p2.x) == 1) {
             delete index;
-            //printf("\t\t3) distance = %d\n", distance);
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gx-1)*p1.y + p2.x;
         }
         else {
             distance = abs(p1.x-p2.x);
             delete index;
-            //pprintf("\t\t4) distance = %d\n", distance);
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
                 index[i] = (rst->gx-1)*p1.y + p2.x + i;
@@ -45,13 +41,11 @@ int* getIndex(point p1, point p2, routingInst *rst){
         // calculate index in rst->edgeCaps
         if ((p1.y-p2.y) == -1) {
             delete index;
-            //printf("\t\t5) distance = %d\n", distance);
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x;
         }
         else if ((p1.y-p2.y) < -1) {
             distance = abs(p1.y-p2.y);
-            //printf("\t\t6) distance = %d\n", distance);
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
@@ -60,13 +54,11 @@ int* getIndex(point p1, point p2, routingInst *rst){
         }
         else if ((p1.y-p2.y) == 1) {
             delete index;
-            //printf("\t\t7) distance = %d\n", distance);
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x;
         }
         else {
             distance = abs(p1.y-p2.y);
-            //printf("\t\t8) distance = %d\n", distance);
             delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
@@ -1146,7 +1138,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
 
         // check for grid size
         if(strncmp(token[0], "grid", 64) == 0){
-            //printf("check for grid size\n");
             int x = atoi(token[1]);
             int y = atoi(token[2]);
 
@@ -1165,20 +1156,16 @@ int readBenchmark(const char *fileName, routingInst *rst){
         }
         // check for edge caps
         else if(strncmp(token[0], "capacity",64) == 0){
-            //printf("check for edge caps\n");
             rst->cap = atoi(token[1]);
             for (int i = 0; i < rst->numEdges; i++) 
                 rst->edgeCaps[i] = rst->cap;
         }
         // check for number of nets
         else if(strncmp(token[0], "num", 64) == 0){
-            //printf("check for number of nets\n");
             rst->numNets = atoi(token[2]);
-            //rst->nets = (net *)malloc(rst->numNets*sizeof(net));
         }
         // check for nets
         else if(strcmp(token[0], "n0") == 0){
-            //printf("we are reading in nets\n");
             for(int i = 0; i < rst->numNets; i++){
                 int num = atoi(token[1]);
                 net *tempNet = new net;
@@ -1226,7 +1213,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
         }
         else{
             int num = atoi(token[0]);
-            //printf("starting blockage constraints, there are %d blockages\n", num);
             for(int i = 0; i < num; i++){
                 fin.getline(buf, 512);
                 // parse the line into blank-delimited tokens
@@ -1245,11 +1231,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
                 p2->x = atoi(token[2]);
                 p2->y = atoi(token[3]);
                 int updatedCap = atoi(token[4]);
-                //printf("\tblockage: %d\n", i);
-                //printf("\tblockage (%d/%d) between (%d,%d)->(%d,%d) with cap %d\n",
-                //        i, num, p1->x, p1->y, p2->x, p2->y, updatedCap);
                 index = getIndex(*p1, *p2, rst);
-                //printf("updating edgeCaps at: %d...\n", index[0]);
                 rst->edgeCaps[index[0]] = updatedCap;
                 delete p1;
                 delete p2;
@@ -1288,7 +1270,6 @@ int solveRouting(routingInst *rst){
                 tempSeg->edges = tempEdges;
 
                 for (int i = 0; i < tempSeg->numEdges; i++){
-                    //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
 
@@ -1321,7 +1302,6 @@ int solveRouting(routingInst *rst){
                 tempSeg->edges = tempEdges;
 
                 for (int i = 0; i < tempSeg->numEdges; i++){
-                    //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
                 // add midPoint to bottomP
@@ -1336,21 +1316,18 @@ int solveRouting(routingInst *rst){
                 tempSeg->edges = tempEdges;
 
                 for (int i = 0; i < tempSeg->numEdges; i++){
-                    //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
             }
         }
     }
     // calculate all edge weights at the beginning
-    //printf("initializing edge weights\n");
     for(int i = 0; i < rst->numEdges; ++i){
         rst->edgeHis[i] = 0;
         rst->edgeOver[i] = max((rst->edgeUtils[i] - rst->edgeCaps[i]), 0);
         if(rst->edgeOver[i] > 0)
             rst->edgeHis[i] += 1;
         rst->edgeWeight[i] = rst->edgeOver[i] * rst->edgeHis[i];
-        //printf("%d, ", rst->edgeWeight[i]);
     }
     return 1;
 }
@@ -1363,16 +1340,14 @@ int RRR(routingInst *rst){
     time(&init_time);
     while(!done){
         calcNetCost(rst);
-        //for(int i = 0; i < rst->numNets; ++i){
-            printf("sending net n%d\n", rst->nets[0].id);
-            printf("net n%d has cost %d | n%d has cost %d", rst->nets.at(0).id, rst->nets.at(0).cost,
-                    rst->nets.at(1).id, rst->nets.at(1).cost);
-            RRRnet(rst, &rst->nets[0]);
-        //}
+        printf("sending net n%d\n", rst->nets[0].id);
+        printf("net n%d has cost %d | n%d has cost %d", rst->nets.at(0).id, rst->nets.at(0).cost,
+                rst->nets.at(1).id, rst->nets.at(1).cost);
+        RRRnet(rst, &rst->nets[0]);
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
         printf("\tcurrent time %.2f\n", seconds);
-        if(seconds >= 100)
+        if(seconds >= 30)
             done = true;
     }
     printf("got out of the while loop\n");
