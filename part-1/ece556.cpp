@@ -1347,7 +1347,7 @@ int RRR(routingInst *rst){
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
         printf("\tcurrent time %.2f\n", seconds);
-        if(seconds >= 30)
+        if(seconds >= 300)
             done = true;
     }
     printf("got out of the while loop\n");

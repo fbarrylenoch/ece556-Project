@@ -33,6 +33,10 @@ main(int argc, char **argv)
  		return 1;
  	}
 
+    /// check for netDecomp
+    if(netDecomp==1)
+        fprintf(stderr, "ERROR: we are not implementing net decomposition\n");
+
  	/// run actual routing
  	status = solveRouting(rst);
  	if(status==0){
@@ -41,9 +45,7 @@ main(int argc, char **argv)
  		return 1;
  	}
 
-    if(netDecomp==1)
-        fprintf(stderr, "ERROR: we are not implementing net decomposition\n");
-
+    /// check for netOrdering
     if(netOrdering==1){
         status = RRR(rst);
         if(status==0){
