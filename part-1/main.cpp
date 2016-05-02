@@ -6,14 +6,16 @@ int
 main(int argc, char **argv)
 {
     signal(SIGSEGV, handler);
- 	if(argc!=3){
- 		fprintf(stderr, "Usage : ./ROUTE.exe <input_benchmark_name> <output_file_name> \n");
+ 	if(argc!=5){
+ 		fprintf(stderr, "Usage : ./ROUTE.exe -d=<num> -n=<num> <input_benchmark_name> <output_file_name> \n");
  		return 1;
  	}
 
  	int status;
-	char *inputFileName = argv[1];
- 	char *outputFileName = argv[2];
+    int netDecomp = argv[1];
+    int netOrdering = argv[2];
+	char *inputFileName = argv[3];
+ 	char *outputFileName = argv[4];
 
  	/// create a new routing instance
  	routingInst *rst = new routingInst;
@@ -33,11 +35,13 @@ main(int argc, char **argv)
  		return 1;
  	}
 
-    status = RRR(rst);
-    if(status==0){
-        fprintf(stderr, "ERROR: running rip-up and re-route\n");
-        release(rst);
-        return 1;
+    if (netOrdering == 1){
+        status = RRR(rst);
+        if(status==0){
+            fprintf(stderr, "ERROR: running rip-up and re-route\n");
+            release(rst);
+            return 1;
+        }
     }
 
  	/// write the result
