@@ -12,10 +12,16 @@ main(int argc, char **argv)
  	}
 
  	int status;
-    int netDecomp = atoi(argv[1]);
-    int netOrdering = atoi(argv[2]);
+    int netDecomp;
+    int netOrdering;
 	char *inputFileName = argv[3];
  	char *outputFileName = argv[4];
+
+    /// set netDecomp and netOrdering
+    char *netDecompString = strtok(argv[1],"=");
+    netDecomp = atoi(&netDecompString[3]);
+    char *netOrderingString = strtok(argv[2],"=");
+    netOrdering = atoi(&netOrderingString[3]);
 
  	/// create a new routing instance
  	routingInst *rst = new routingInst;
@@ -35,7 +41,10 @@ main(int argc, char **argv)
  		return 1;
  	}
 
-    if (netOrdering == 1){
+    if(netDecomp==1)
+        fprintf(stderr, "ERROR: we are not implementing net decomposition\n");
+
+    if(netOrdering==1){
         status = RRR(rst);
         if(status==0){
             fprintf(stderr, "ERROR: running rip-up and re-route\n");
