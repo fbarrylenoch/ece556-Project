@@ -12,8 +12,8 @@ main(int argc, char **argv)
  	}
 
  	int status;
-    int netDecomp = argv[1];
-    int netOrdering = argv[2];
+    int netDecomp = atoi(argv[1]);
+    int netOrdering = atoi(argv[2]);
 	char *inputFileName = argv[3];
  	char *outputFileName = argv[4];
 
