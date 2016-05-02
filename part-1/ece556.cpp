@@ -323,6 +323,8 @@ route shapeZ(point p1, point p2, routingInst *rst){
         // allocate space for routeZ and routeComp
         routeZ.segments = (segment *)malloc(3*sizeof(segment));
         routeZ.numSegs = 0;
+        routeComp.segments = (segment *)malloc(3*sizeof(segment));
+        routeComp.numSegs = 0;
         /* assign outside most Z route */
         // assign top point
         if (p1.y < p2.y) {
@@ -379,7 +381,6 @@ route shapeZ(point p1, point p2, routingInst *rst){
         //check every other possible Z route and compare weights
         for (int i = 1; i < (abs(p1.x - p2.x)-1); i++){
             routeComp.numSegs = 0;
-            routeComp.segments = (segment *)malloc(3*sizeof(segment));
             // create midpoints
             topMidPoint.x = (topPoint.x + ((1 + i)*multiplier));
             topMidPoint.y = topPoint.y;
@@ -421,7 +422,6 @@ route shapeZ(point p1, point p2, routingInst *rst){
             routeZ_weight = calcRouteCost(&routeZ, rst);
             if (routeComp_weight < routeZ_weight)
                 routeZ = routeComp;
-            delete routeComp.segments;
         }
     }
     // return the route
@@ -450,6 +450,8 @@ route shapeRZ(point p1, point p2, routingInst *rst){
         // allocate space for routeRZ and routeComp
         routeRZ.segments = (segment *)malloc(3*sizeof(segment));
         routeRZ.numSegs = 0;
+        routeComp.segments = (segment *)malloc(3*sizeof(segment));
+        routeComp.numSegs = 0;
         // assign farthest left oriented Z route
         if (p1.x < p2.x) {
             rightPoint = p2;
@@ -504,7 +506,6 @@ route shapeRZ(point p1, point p2, routingInst *rst){
 
         //check every other possible RZ route and compare weights
         for (int i = 1; i < (abs(p1.y - p2.y)-1); i++){
-            routeComp.segments = (segment *)malloc(3*sizeof(segment));
             routeComp.numSegs = 0;
             // create midpoints
             leftMidPoint.x = leftPoint.x;
@@ -547,7 +548,6 @@ route shapeRZ(point p1, point p2, routingInst *rst){
             routeRZ_weight = calcRouteCost(&routeRZ, rst);
             if (routeComp_weight < routeRZ_weight)
                 routeRZ = routeComp;
-            delete routeComp.segments;
         }
     }
     // return the route
@@ -599,6 +599,8 @@ route shapeU(point p1, point p2, routingInst *rst){
         // allocate size
         routeU.segments = (segment *)malloc(3*sizeof(segment));
         routeU.numSegs = 0;
+        routeComp.segments = (segment *)malloc(3*sizeof(segment));
+        routeComp.numSegs = 0;
         //find the best ShapeU route
         leftMidPoint.x = leftPoint.x;
         leftMidPoint.y = (bottomPoint.y - 1);
@@ -638,7 +640,6 @@ route shapeU(point p1, point p2, routingInst *rst){
         //check every other possible U route and compare weights
         if (bottomPoint.y - 2 >= 0) { /* may have to be -1 */
             for (int i = 2; i <= bottomPoint.y; i++) {
-                routeComp.segments = (segment *)malloc(3*sizeof(segment));
                 routeComp.numSegs = 0;
                 // create midpoints
                 leftMidPoint.x = leftPoint.x;
@@ -681,7 +682,6 @@ route shapeU(point p1, point p2, routingInst *rst){
                 routeU_weight = calcRouteCost(&routeU, rst);
                 if (routeComp_weight < routeU_weight)
                     routeU = routeComp;
-                delete routeComp.segments;
             }
         }
         // return the route
@@ -734,6 +734,8 @@ route shapeRU(point p1, point p2, routingInst *rst){
         // allocate size
         routeRU.segments = (segment *)malloc(3*sizeof(segment));
         routeRU.numSegs = 0;
+        routeComp.segments = (segment *)malloc(3*sizeof(segment));
+        routeComp.numSegs = 0;
         //find the best ShapeU route
         leftMidPoint.x = leftPoint.x;
         leftMidPoint.y = (topPoint.y + 1);
@@ -773,7 +775,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
         //check every other possible RU route and compare weights
         if (topPoint.y <= (rst->gy - 2)) {
             for (int i = 2; i <= (rst->gx - topPoint.y); i++) {
-                routeComp.segments = (segment *)malloc(3*sizeof(segment));
                 routeComp.numSegs = 0;
                 // create midpoints
                 leftMidPoint.x = leftPoint.x;
@@ -816,7 +817,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 routeRU_weight = calcRouteCost(&routeRU, rst);
                 if (routeComp_weight < routeRU_weight)
                     routeRU = routeComp;
-                delete routeComp.segments;
             }
         }
         // return the route
@@ -1347,7 +1347,7 @@ int RRR(routingInst *rst){
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
         printf("\tcurrent time %.2f\n", seconds);
-        if(seconds >= 300)
+        if(seconds >= 30)
             done = true;
     }
     printf("got out of the while loop\n");
@@ -1425,20 +1425,6 @@ int writeOutput(const char *outRouteFile, routingInst *rst){
     } catch(int e) {
         return 0;
     }
-    return 1;
-}
-
-int printWireLen(routingInst *rst){
-    int TWL = 0, TOF = 0;
-    for(int i = 0; i < rst->numEdges; ++i){
-        if((rst->edgeUtils[i] - rst->edgeCaps[i]) > 0)
-            TOF += (rst->edgeUtils[i] - rst->edgeCaps[i]);
-        if(rst->edgeUtils[i] > 0)
-            TWL += rst->edgeUtils[i];
-    }
-    printf("total wirelength is %d\ntotal overflow is %d\n", TWL, TOF);
-
-
     return 1;
 }
 
