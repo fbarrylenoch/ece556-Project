@@ -161,6 +161,8 @@ using std::endl;
    output: 1 if successful, 0 otherwise 
   */
   int writeOutput(const char *outRouteFile, routingInst *rst);
+
+  int printWireLen(routingInst *rst);
   
   /* int release(routingInst *rst)
      Release the memory for all the allocated data structures. 
