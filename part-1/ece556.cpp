@@ -1481,6 +1481,20 @@ int writeOutput(const char *outRouteFile, routingInst *rst){
     return 1;
 }
 
+int printWireLen(routingInst *rst){
+    int TWL = 0, TOF = 0;
+    for(int i = 0; i < rst->numEdges; ++i){
+        if((rst->edgeUtils[i] - rst->edgeCaps[i]) > 0)
+            TOF += (rst->edgeUtils[i] - rst->edgeCaps[i]);
+        if(rst->edgeUtils[i] > 0)
+            TWL += rst->edgeUtils[i];
+    }
+    printf("total wirelength is %d\ntotal overflow is %d\n", TWL, TOF);
+
+
+    return 1;
+}
+
 int printRoutingInstince (routingInst *rst){
     for(int i = 0; i < rst->numNets; ++i){
         printf("net n%d, has %d pins\n", i, rst->nets.at(i).numPins);

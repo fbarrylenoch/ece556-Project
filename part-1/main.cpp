@@ -33,12 +33,20 @@ main(int argc, char **argv)
  		return 1;
  	}
 
-    status = RRR(rst);
+    //status = RRR(rst);
     if(status==0){
         fprintf(stderr, "ERROR: running rip-up and re-route\n");
         release(rst);
         return 1;
     }
+
+ 	/// write the result
+ 	status = printWireLen(rst);
+ 	if(status==0){
+ 		fprintf(stderr, "ERROR: writing the result \n");
+ 		release(rst);
+ 		return 1;
+ 	}
 
  	/// write the result
  	status = writeOutput(outputFileName, rst);
