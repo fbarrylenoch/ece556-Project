@@ -88,16 +88,16 @@ void RRRnet(routingInst *rst, net *netRRR){
     route routeRZ; /* used to store the best Rotated Z route option */
     route routeU; /* used to store the best U route option */
     route routeRU; /* used to store the best U route option */
-    route routeC; /* used to store the best U route option */
-    route routeRC; /* used to store the best C route option */
+    //route routeC; /* used to store the best U route option */
+    //route routeRC; /* used to store the best C route option */
     route routeBest;
     int routeL_weight,
         routeZ_weight,
         routeRZ_weight,
         routeU_weight,
         routeRU_weight,
-        routeC_weight,
-        routeRC_weight,
+        //routeC_weight,
+        //routeRC_weight,
         routeBest_weight;
         
 
@@ -134,10 +134,10 @@ void RRRnet(routingInst *rst, net *netRRR){
         // try Rotated U shape
         routeRU = shapeRU(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try C shape
-        /*routeC = shapeC(netRRR->pins[i],netRRR->pins[i+1],rst);
+        //routeC = shapeC(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try Rotated C shape
-        routeRC = shapeRC(netRRR->pins[i],netRRR->pins[i+1],rst);
-        */
+        //routeRC = shapeRC(netRRR->pins[i],netRRR->pins[i+1],rst);
+        
         
         // get weights of each route
         routeL_weight = calcRouteCost(&routeL, rst);
@@ -145,9 +145,9 @@ void RRRnet(routingInst *rst, net *netRRR){
         routeRZ_weight = calcRouteCost(&routeRZ, rst);
         routeU_weight = calcRouteCost(&routeU, rst);
         routeRU_weight = calcRouteCost(&routeRU, rst);
-        /*routeC_weight = calcRouteCost(&routeC, rst);
-        routeRC_weight = calcRouteCost(&routeRC, rst);
-        */
+        //routeC_weight = calcRouteCost(&routeC, rst);
+        //routeRC_weight = calcRouteCost(&routeRC, rst);
+        
         
         //compare weights and take lowest cost route
         routeBest = routeL;
@@ -174,12 +174,12 @@ void RRRnet(routingInst *rst, net *netRRR){
             routeBest_weight = routeRU_weight;
         }
         /*if (routeC_weight < routeBest_weight) {
-            printf("\tfor pins %d - %d, C is the best\n",i,i+1);
+            //printf("\tfor pins %d - %d, C is the best\n",i,i+1);
             routeBest = routeC;
             routeBest_weight = routeC_weight;
         }
         if (routeRC_weight < routeBest_weight) {
-            printf("\tfor pins %d - %d, RC is the best\n",netRRR->pins[i],netRRR->pins[i+1]);
+            //printf("\tfor pins %d - %d, RC is the best\n",netRRR->pins[i],netRRR->pins[i+1]);
             routeBest = routeRC;
             routeBest_weight = routeRC_weight;
         }*/
