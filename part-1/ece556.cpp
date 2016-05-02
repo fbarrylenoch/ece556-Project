@@ -1261,8 +1261,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
 
 int solveRouting(routingInst *rst){
     //get every net in rst
-    int TOF = 0; // temporarily being used to calculate total overflow
-    int TWL = 0; // temporarily being used to calculate total wire length
     for (int i = 0; i < rst->numNets; i++) {
         net *tempNet = &(rst->nets.at(i));
         tempNet->nroute.numSegs = 0;
@@ -1326,21 +1324,12 @@ int solveRouting(routingInst *rst){
                     //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
-
-                // uncomment for test purposes
-                /*cout << "Start Segment:\n";
-                for (int i = 0; i < tempSeg->numEdges; i++) {
-                    cout << "edge: " << tempSeg->edges[i] << "\n";
-                }
-                cout << "\n";*/
-
                 // add midPoint to bottomP
                 tempSeg = &(tempNet->nroute.segments[tempNet->nroute.numSegs]);
                 tempNet->nroute.numSegs++;
                 tempSeg->p1 = midPoint;
                 tempSeg->p2 = bottomP;
                 tempSeg->numEdges = abs(midPoint.x - bottomP.x);
-
                 // save edges to the segment
                 tempEdges = getIndex(midPoint,bottomP,rst);
                 tempSeg->edges = (int *)malloc(tempSeg->numEdges*sizeof(int));
@@ -1350,13 +1339,6 @@ int solveRouting(routingInst *rst){
                     //rst->edgeCaps[tempSeg->edges[i]]--;
                     rst->edgeUtils[tempSeg->edges[i]]++;
                 }
-
-                // uncomment for test purposes
-                /*cout << "Start Segment:\n";
-                for (int i = 0; i < tempSeg->numEdges; i++) {
-                    cout << "edge: " << tempSeg->edges[i] << "\n";
-                }
-                cout << "\n";*/
             }
         }
     }
@@ -1370,16 +1352,6 @@ int solveRouting(routingInst *rst){
         rst->edgeWeight[i] = rst->edgeOver[i] * rst->edgeHis[i];
         //printf("%d, ", rst->edgeWeight[i]);
     }
-
-    // I am like 80% sure this works...
-    for (int i = 0; i < rst->numEdges; i++){
-        if (rst->edgeCaps[i] < 0)
-            TOF = TOF + abs(rst->edgeCaps[i]);
-        if (rst->edgeUtils[i] > 0)
-            TWL = TWL + rst->edgeUtils[i];
-    }
-    //cout << "Total Overflow: " << TOF << endl;
-    //cout << "Total Wire Length: " << TWL << endl;
     return 1;
 }
 
@@ -1400,7 +1372,7 @@ int RRR(routingInst *rst){
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
         printf("\tcurrent time %.2f\n", seconds);
-        if(seconds > 15)
+        if(seconds > 60)
             done = true;
     }
     printf("got out of the while loop\n");
