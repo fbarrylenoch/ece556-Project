@@ -1,6 +1,6 @@
 #include "ece556.h"
 
-int* getIndex(point p1, point p2, routingInst *rst){
+int* getIndex(point p1, point p2, routingInst *rst){ //, std::vector<int>* indicies){
     int *index;
     int distance;
     index = (int *)malloc(sizeof(int));
@@ -10,26 +10,26 @@ int* getIndex(point p1, point p2, routingInst *rst){
     if (p1.y == p2.y) {
         // calculate index in rst->edgeCaps
         if ((p1.x-p2.x) == -1) {
-            delete index;
+            //delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gx-1)*p1.y + p1.x;
         }
         else if((p1.x-p2.x) < -1) {
             distance = abs(p1.x-p2.x);
-            delete index;
+            //delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
                 index[i] = (rst->gx-1)*p1.y + p1.x + i;
             }
         }            
         else if((p1.x-p2.x) == 1) {
-            delete index;
+            //delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gx-1)*p1.y + p2.x;
         }
         else {
             distance = abs(p1.x-p2.x);
-            delete index;
+            //delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
                 index[i] = (rst->gx-1)*p1.y + p2.x + i;
@@ -40,26 +40,26 @@ int* getIndex(point p1, point p2, routingInst *rst){
     else if(p1.x == p2.x){
         // calculate index in rst->edgeCaps
         if ((p1.y-p2.y) == -1) {
-            delete index;
+            //delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x;
         }
         else if ((p1.y-p2.y) < -1) {
             distance = abs(p1.y-p2.y);
-            delete index;
+            //delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
                 index[i] = (rst->gy)*(rst->gx-1) + rst->gx*(p1.y + i) + p1.x;
             }
         }
         else if ((p1.y-p2.y) == 1) {
-            delete index;
+            //delete index;
             index = (int *)malloc(sizeof(int));
             index[0] = (rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x;
         }
         else {
             distance = abs(p1.y-p2.y);
-            delete index;
+            //delete index;
             index = (int *)malloc(distance*sizeof(int));
             for (int i=0; i < distance; i++) {
                 index[i] = (rst->gy)*(rst->gx-1) + rst->gx*(p2.y + i) + p1.x;
@@ -107,7 +107,7 @@ void RRRnet(routingInst *rst, net *netRRR){
     calcEdgeWeights(&routeRRR,rst);
     // clear the segments of the route
     routeRRR.numSegs = 0;
-    delete routeRRR.segments;
+    //delete routeRRR.segments;
 
     // reroute
     /* allocate enough memory for every connection from pin to pin to be the largest number of segments */
@@ -216,6 +216,7 @@ route shapeL(point p1, point p2, routingInst *rst){
         int* edgesL = getIndex(p1,p2,rst);
         segL->edges = (int *)malloc(segL->numEdges*sizeof(int));
         segL->edges = edgesL;
+        delete edgesL;
     }
     else{
 
@@ -295,6 +296,7 @@ route shapeL(point p1, point p2, routingInst *rst){
         routeL_weight = calcRouteCost(&routeL, rst);
         if (routeComp_weight < routeL_weight)
             routeL = routeComp;
+
         /* compare and take route with lowest weight */
         // need edge weight to be completed before this can be completed
     }
@@ -1347,7 +1349,7 @@ int RRR(routingInst *rst){
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
         printf("\tcurrent time %.2f\n", seconds);
-        if(seconds >= 30)
+        if(seconds >= 10)
             done = true;
     }
     printf("got out of the while loop\n");
@@ -1459,6 +1461,7 @@ int release(routingInst *rst){
             delete deleteNet.pins;
         }
         delete rst->edgeCaps;
+        
         delete rst;
 
     } catch(int e) {
