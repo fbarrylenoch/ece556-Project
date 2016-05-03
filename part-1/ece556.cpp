@@ -470,6 +470,7 @@ int RRRnet(routingInst *rst, net *netRRR){
         routeZ_weight = calcRouteCost(&routeZ, rst);
         routeRZ_weight = calcRouteCost(&routeRZ, rst);
         routeU_weight = calcRouteCost(&routeU, rst);
+        printf("\t\tcalculating routeRU weight\n");
         routeRU_weight = calcRouteCost(&routeRU, rst);
         printf("\twe have calculated all weights for each route\n");
         
