@@ -373,7 +373,7 @@ int calcRouteCost(route *newRoute, routingInst *rst){
         }
         // over all edges in the segment
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            printf("\trst->edgeWeight[indices[j]]= %d",rst->edgeWeight[indices[j]]);
+            printf("\trst->edgeWeight[indices[j]]= %d\n",rst->edgeWeight[indices[j]]);
             cost += rst->edgeWeight[indices[j]];
         }
         indices.clear();
