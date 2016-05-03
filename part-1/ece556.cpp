@@ -360,26 +360,23 @@ int calcEdgeWeights(route *newRoute, routingInst *rst){
 }
 
 int calcRouteCost(route *newRoute, routingInst *rst){
-    printf("Entered calcRouteCost\n");
     vector<int> indices;
     int cost, status;
     cost = 0;
     // over all segments in the route
     for(int i = 0; i < newRoute->numSegs; ++i){
         status = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst, &indices);
-        if(status==0){
-            printf("\tgetIndex failed\n");
+        if(status==0)
             return 0;
-        }
         // over all edges in the segment
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            //printf("\trst->edgeWeight[indices[j]]= %d\n",rst->edgeWeight[indices[j]]);
+            printf("\tindices[j]= %d\n",indices[j]);
             cost += rst->edgeWeight[indices[j]];
         }
         indices.clear();
     }
-    printf("Leaving calcRouteCost\n\n");
     return cost;
+    printf("End calcRouteCost\n\n\n");
 }
 
 int calcNetCost(routingInst *rst){
