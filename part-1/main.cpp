@@ -60,7 +60,7 @@ main(int argc, char **argv)
             return 1;
         }
     }
-/*
+
  	/// write the result
  	status = printWireLen(rst);
  	if(status==0){
@@ -68,7 +68,7 @@ main(int argc, char **argv)
  		release(rst);
  		return 1;
  	}
-*/
+
  	/// write the result
  	status = writeOutput(outputFileName, rst);
  	if(status==0){
