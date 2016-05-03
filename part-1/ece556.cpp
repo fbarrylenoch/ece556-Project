@@ -532,6 +532,7 @@ int RRRnet(routingInst *rst, net *netRRR){
 
 // returns best L shape route - return straight line if in line
 route shapeL(point p1, point p2, routingInst *rst){
+    cout << "\tin L\n";
     vector<int> edgeL;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -675,6 +676,7 @@ route shapeL(point p1, point p2, routingInst *rst){
 
 // returns best Z shape route - call shapeL if too close to make a Z
 route shapeZ(point p1, point p2, routingInst *rst){
+    cout << "\tin Z\n";
     vector<int> edgeZ;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -841,6 +843,7 @@ route shapeZ(point p1, point p2, routingInst *rst){
 
 // returns best Rotated Z shape route - call shapeL if too close to make a RZ
 route shapeRZ(point p1, point p2, routingInst *rst){
+    cout << "\tin RZ\n";
     vector<int> edgeRZ;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -1006,6 +1009,7 @@ route shapeRZ(point p1, point p2, routingInst *rst){
 
 // returns best U shape route
 route shapeU(point p1, point p2, routingInst *rst){
+    cout << "\tin U\n";
     vector<int> edgeU;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -1181,6 +1185,7 @@ route shapeU(point p1, point p2, routingInst *rst){
 
 // returns the best Rotated U shape route
 route shapeRU(point p1, point p2, routingInst *rst){
+    cout << "\tin RU\n";
     vector<int> edgeRU;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
