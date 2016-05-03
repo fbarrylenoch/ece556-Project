@@ -466,11 +466,15 @@ int RRRnet(routingInst *rst, net *netRRR){
         
         
         // get weights of each route
+        
         routeL_weight = calcRouteCost(&routeL, rst);
+        printf("\t\tcalculated routeL weight\n");
         routeZ_weight = calcRouteCost(&routeZ, rst);
+        printf("\t\tcalculated routeZ weight\n");
         routeRZ_weight = calcRouteCost(&routeRZ, rst);
+        printf("\t\tcalculated routeRZ weight\n");
         routeU_weight = calcRouteCost(&routeU, rst);
-        printf("\t\tcalculating routeRU weight\n");
+        printf("\t\tcalculated routeU weight\n");
         routeRU_weight = calcRouteCost(&routeRU, rst);
         printf("\twe have calculated all weights for each route\n");
         
@@ -1197,7 +1201,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
     
      // return empty route if same x values
     if (p1.x == p2.x){
-        printf("returning empty route\n");
+        //printf("returning empty route\n");
         return routeRU;
     }
 
@@ -1363,7 +1367,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
             }
         }
         // return the route
-        printf("leaving RU\n");
+        //printf("leaving RU\n");
         return routeRU;
     }
 }
