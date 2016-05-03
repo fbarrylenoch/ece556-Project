@@ -1353,6 +1353,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
             }
         }
         // return the route
+        printf("leaving RU\n");
         return routeRU;
     }
 }
