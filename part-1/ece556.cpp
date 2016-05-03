@@ -333,10 +333,9 @@ int RRR(routingInst *rst){
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
         printf("\tcurrent time %.2f\n", seconds);
-        if(seconds >= 10)
+        if(seconds >= 120)
             done = true;
     }
-    printf("got out of the while loop\n");
     return 1;
 }
 
@@ -541,40 +540,31 @@ route shapeL(point p1, point p2, routingInst *rst){
     point bottomP; // used to calculate route  
     point midPoint; // used to calculate route  
     int routeComp_weight, routeL_weight, status;
-
-    //printf("\t\tWe have made it into shapeL\n");
     
     // check if straight line, assign routeL if so  
     if (p1.x == p2.x || p1.y == p2.y) {
-        //printf("\t\tThe two points are a straight line\n");
-        //routeL.segments = (segment *)malloc(sizeof(segment));
         routeL.numSegs = 0;
 
-        segment *segL = new segment; //&(routeL.segments[routeL.numSegs]);
+        segment *segL = new segment;
         routeL.numSegs++;
         segL->p1 = p1;
         segL->p2 = p2;
-        //printf("\t\tset the points for the segment\n");
         if (p1.x == p2.x) {
             segL->numEdges = abs(p1.y - p2.y);
         }
         else {
             segL->numEdges = abs(p1.x - p2.x);
         }
-        //printf("\t\tcalculated the number of edges\n");
         status = getIndex(segL->p1, segL->p2, rst, &edgeL);
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-        //segL->edges = (int *)malloc(segL->numEdges*sizeof(int));
         for(int i = 0; i < (int)edgeL.size(); ++i)
             segL->edges.push_back(edgeL[i]);
         edgeL.clear();
         routeL.segments.push_back(*segL);
         delete segL;
-        //printf("\t\tadded the new edges to the segment\n");
     }
     else{
-
         //printf("\t\tThe two points are an L shape\n");
         // assign L shape route  
         if (p1.y < p2.y) {
@@ -585,25 +575,22 @@ route shapeL(point p1, point p2, routingInst *rst){
             topP = p1;
             bottomP = p2;
         }
-        // allocate routeL
-        //routeL.segments = (segment *)malloc(2*sizeof(segment));
+        
         routeL.numSegs = 0;
-        
-        // assign top and bottom points
-        segment *segL = new segment; //&(routeL.segments[routeL.numSegs]);
-        routeL.numSegs++;
-        segL->p1 = topP;
-        
         // create a midPoint
         midPoint.x = topP.x;
         midPoint.y = bottomP.y;
+        
+        // assign top and bottom points
+        segment *segL = new segment;
+        routeL.numSegs++;
+        segL->p1 = topP;        
         segL->p2 = midPoint;
         segL->numEdges = abs(topP.y - midPoint.y);
         // save edges to the segment
         status = getIndex(segL->p1, segL->p2, rst, &edgeL);
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-        //segL->edges = (int *)malloc(segL->numEdges*sizeof(int));
         for(int i = 0; i < (int)edgeL.size(); ++i)
             segL->edges.push_back(edgeL[i]);
         edgeL.clear();
@@ -611,17 +598,15 @@ route shapeL(point p1, point p2, routingInst *rst){
         delete segL;
         
         // add midPoint to bottomP
-        segL = new segment; //&(routeL.segments[routeL.numSegs]);
+        segL = new segment;
         routeL.numSegs++;
         segL->p1 = midPoint;
         segL->p2 = bottomP;
         segL->numEdges = abs(midPoint.x - bottomP.x);
-        
         // save edges to the segment
         status = getIndex(segL->p1, segL->p2, rst, &edgeL);
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-        //segL->edges = (int *)malloc(segL->numEdges*sizeof(int));
         for(int i = 0; i < (int)edgeL.size(); ++i)
             segL->edges.push_back(edgeL[i]);
         edgeL.clear();
@@ -644,7 +629,7 @@ route shapeL(point p1, point p2, routingInst *rst){
         midPoint.x = bottomP.x;
         
         // assign top and bottom points
-        segment *segComp = new segment; //&(routeComp.segments[routeComp.numSegs]);
+        segment *segComp = new segment;
         routeComp.numSegs++;
         segComp->p1 = topP;
         segComp->p2 = midPoint;
@@ -665,7 +650,6 @@ route shapeL(point p1, point p2, routingInst *rst){
         segComp->p1 = midPoint;
         segComp->p2 = bottomP;
         segComp->numEdges = abs(midPoint.y - bottomP.y);
-        
         // save edges to the segment
         status = getIndex(segComp->p1, segComp->p2, rst, &edgeComp);
         if(status==0)
@@ -680,8 +664,8 @@ route shapeL(point p1, point p2, routingInst *rst){
         routeL_weight = calcRouteCost(&routeL, rst);
         if (routeComp_weight < routeL_weight)
             routeL = routeComp;
-
         routeComp.segments.clear();
+        
         // compare and take route with lowest weight  
         // need edge weight to be completed before this can be completed
     }
@@ -956,7 +940,7 @@ route shapeRZ(point p1, point p2, routingInst *rst){
             rightMidPoint.y = leftPoint.y - ((1 + i) * multiplier);
 
             // create left segment
-            segment *segComp = new segment; //&(routeComp.segments[routeComp.numSegs]);
+            segment *segComp = new segment;
             routeComp.numSegs++;
             segComp->p1 = leftPoint;
             segComp->p2 = leftMidPoint;
@@ -970,10 +954,9 @@ route shapeRZ(point p1, point p2, routingInst *rst){
             edgeComp.clear();
             routeComp.segments.push_back(*segComp);
             delete segComp;
-            printf("\t\tmade compare seg1\n");
 
             // create mid segment
-            segComp = new segment; // &(routeComp.segments[routeComp.numSegs]);
+            segComp = new segment;
             routeComp.numSegs++;
             segComp->p1 = leftMidPoint;
             segComp->p2 = rightMidPoint;
@@ -987,10 +970,9 @@ route shapeRZ(point p1, point p2, routingInst *rst){
             edgeComp.clear();
             routeComp.segments.push_back(*segComp);
             delete segComp;
-            printf("\t\tmade compare seg2\n");
 
             // create right segment
-            segComp = &(routeComp.segments[routeComp.numSegs]);
+            segComp = new segment;
             routeComp.numSegs++;
             segComp->p1 = rightMidPoint;
             segComp->p2 = rightPoint;
@@ -999,15 +981,12 @@ route shapeRZ(point p1, point p2, routingInst *rst){
             status = getIndex(segComp->p1, segComp->p2, rst, &edgeComp);
             if(status==0)
                 fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-            printf("\t\tmade it back from getIndex\n");
-            for(int j = 0; j < (int)edgeComp.size(); ++j){
-                printf("\t\tedges being written %d\n", edgeComp[j]);
+            for(int j = 0; j < (int)edgeComp.size(); ++j){;
                 segComp->edges.push_back(edgeComp[j]);
             }
             edgeComp.clear();
             routeComp.segments.push_back(*segComp);
             delete segComp;
-            printf("\t\tmade compare seg3\n");
 
             // check if weight is lower than routeRZ, assign to routeRZ if true
             routeComp_weight = calcRouteCost(&routeComp, rst); 
@@ -1038,7 +1017,6 @@ route shapeU(point p1, point p2, routingInst *rst){
     point leftMidPoint;
     point rightMidPoint;
     int routeComp_weight, routeU_weight, status;
-    printf("\t\tWe have made it into shapeU\n");
     
      // return empty route if same x values
     if (p1.x == p2.x){
@@ -1145,9 +1123,9 @@ route shapeU(point p1, point p2, routingInst *rst){
                 // get left edges
                 status = getIndex(segComp->p1, segComp->p2, rst, &edgeComp);
                 if(status==0)
-                    fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");                
+                    fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
                 for(int j = 0; j < (int)edgeComp.size(); ++j)
-                    segComp->edges[j] = edgeComp[j];
+                    segComp->edges.push_back(edgeComp[j]);
                 edgeComp.clear();
                 routeComp.segments.push_back(*segComp);
                 delete segComp;
@@ -1163,10 +1141,11 @@ route shapeU(point p1, point p2, routingInst *rst){
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");                
                 for(int j = 0; j < (int)edgeComp.size(); ++j)
-                    segComp->edges[j] = edgeComp[j];
+                    segComp->edges.push_back(edgeComp[j]);
                 edgeComp.clear();
                 routeComp.segments.push_back(*segComp);
                 delete segComp;
+
                 
                 // create right segment
                 segComp = new segment;
@@ -1179,7 +1158,7 @@ route shapeU(point p1, point p2, routingInst *rst){
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");                
                 for(int j = 0; j < (int)edgeComp.size(); ++j)
-                    segComp->edges[j] = edgeComp[j];
+                    segComp->edges.push_back(edgeComp[j]);
                 edgeComp.clear();
                 routeComp.segments.push_back(*segComp);
                 delete segComp;
@@ -1213,7 +1192,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
     point leftMidPoint;
     point rightMidPoint;
     int routeComp_weight, routeRU_weight, status;
-    printf("\t\tWe have made it into shapeRU\n");
     
      // return empty route if same x values
     if (p1.x == p2.x){

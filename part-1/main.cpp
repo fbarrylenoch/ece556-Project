@@ -56,7 +56,7 @@ main(int argc, char **argv)
             return 1;
         }
     }
-    printf("we have riped it up and rerouted it\n");
+    printf("finished rip-up and reroute\n");
 
  	/// write the result
  	status = printWireLen(rst);
