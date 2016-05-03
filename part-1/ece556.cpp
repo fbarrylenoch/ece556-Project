@@ -532,7 +532,7 @@ int RRRnet(routingInst *rst, net *netRRR){
 
 // returns best L shape route - return straight line if in line
 route shapeL(point p1, point p2, routingInst *rst){
-    cout << "\tin L\n";
+    printf("in L with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
     vector<int> edgeL;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -676,7 +676,7 @@ route shapeL(point p1, point p2, routingInst *rst){
 
 // returns best Z shape route - call shapeL if too close to make a Z
 route shapeZ(point p1, point p2, routingInst *rst){
-    cout << "\tin Z\n";
+    printf("in Z with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
     vector<int> edgeZ;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -843,7 +843,7 @@ route shapeZ(point p1, point p2, routingInst *rst){
 
 // returns best Rotated Z shape route - call shapeL if too close to make a RZ
 route shapeRZ(point p1, point p2, routingInst *rst){
-    cout << "\tin RZ\n";
+    printf("in RZ with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
     vector<int> edgeRZ;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -1009,7 +1009,7 @@ route shapeRZ(point p1, point p2, routingInst *rst){
 
 // returns best U shape route
 route shapeU(point p1, point p2, routingInst *rst){
-    cout << "\tin U\n";
+    printf("in U with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
     vector<int> edgeU;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -1185,7 +1185,7 @@ route shapeU(point p1, point p2, routingInst *rst){
 
 // returns the best Rotated U shape route
 route shapeRU(point p1, point p2, routingInst *rst){
-    cout << "\tin RU\n";
+    printf("in RU with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
     vector<int> edgeRU;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
