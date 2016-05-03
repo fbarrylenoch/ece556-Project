@@ -15,6 +15,7 @@ using std::min;
 #include <stdlib.h>
 #include <unistd.h>
 #include <vector>
+using std::vector;
 
 #include <fstream>
 using std::ifstream;
@@ -46,7 +47,7 @@ using std::endl;
    point p2 ; 	/* end point of a segment */
    
    int numEdges ; 	/* number of edges in the segment*/
-   int *edges ;  	/* array of edges representing the segment*/
+   vector<int> edges ;  	/* array of edges representing the segment*/
    
  } segment ;
  
@@ -57,7 +58,7 @@ using std::endl;
   typedef struct
   {
     int numSegs ;  	/* number of segments in a route*/
-    segment *segments ;  /* an array of segments (note, a segment may be flat, L-shaped or any other shape, based on your preference */
+    vector<segment> segments ;  /* an array of segments (note, a segment may be flat, L-shaped or any other shape, based on your preference */
 
   } route ;
  
@@ -87,7 +88,7 @@ using std::endl;
    int cap ;
    
    int numNets ;	/* number of nets */
-   std::vector<net> nets ;/* array of nets {===> or we could use a vector of nets here <=== }*/ 
+   vector<net> nets ;/* array of nets {===> or we could use a vector of nets here <=== }*/ 
    
    int numEdges ; 	/* number of edges of the grid */
    int *edgeCaps; 	/* array of the actual edge capacities after considering for blockages */
@@ -113,7 +114,7 @@ using std::endl;
   */
  int readBenchmark(const char *fileName, routingInst *rst);
 
- int* getIndex(point p1, point p2, routingInst *rst);
+ int getIndex(point p1, point p2, routingInst *rst, vector<int>* indices);
 
  int printRoutingInstince (routingInst *rst);
   
@@ -132,7 +133,7 @@ using std::endl;
 
  int calcNetCost(routingInst *rst);
  
- void RRRnet(routingInst *rst, net *netRRR);
+ int RRRnet(routingInst *rst, net *netRRR);
 
  route shapeL(point p1, point p2, routingInst *rst);
  

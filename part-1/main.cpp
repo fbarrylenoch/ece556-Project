@@ -32,6 +32,7 @@ main(int argc, char **argv)
  		fprintf(stderr, "ERROR: reading input file \n");
  		return 1;
  	}
+    printf("we have read in the benchmark\n");
 
     /// check for netDecomp
     if(netDecomp==1)
@@ -44,13 +45,8 @@ main(int argc, char **argv)
  		release(rst);
  		return 1;
  	}
+    printf("we have finished the initial solution\n");
 
-    status = RRR(rst);
-    if(status==0){
-        fprintf(stderr, "ERROR: running rip-up and re-route\n");
-        release(rst);
-        return 1;
-    }
     /// check for netOrdering
     if(netOrdering==1){
         status = RRR(rst);
@@ -60,6 +56,7 @@ main(int argc, char **argv)
             return 1;
         }
     }
+    printf("we have riped it up and rerouted it\n");
 
  	/// write the result
  	status = printWireLen(rst);
