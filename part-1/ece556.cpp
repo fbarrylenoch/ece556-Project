@@ -1246,8 +1246,10 @@ route shapeRU(point p1, point p2, routingInst *rst){
         status = getIndex(segRU->p1, segRU->p2, rst, &edgeRU);
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-        for(int i = 0; i < (int)edgeRU.size(); ++i)
+        for(int i = 0; i < (int)edgeRU.size(); ++i){
+            printf("\tedgeRU[i]= %d",edgeRU[i]);
             segRU->edges.push_back(edgeRU[i]);
+        }
         edgeRU.clear();
         routeRU.segments.push_back(*segRU);
         delete segRU;
@@ -1262,8 +1264,10 @@ route shapeRU(point p1, point p2, routingInst *rst){
         status = getIndex(segRU->p1, segRU->p2, rst, &edgeRU);
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-        for(int i = 0; i < (int)edgeRU.size(); ++i)
+        for(int i = 0; i < (int)edgeRU.size(); ++i){
+            printf("\tedgeRU[i]= %d",edgeRU[i]);
             segRU->edges.push_back(edgeRU[i]);
+        }
         edgeRU.clear();
         routeRU.segments.push_back(*segRU);
         delete segRU;
@@ -1278,8 +1282,10 @@ route shapeRU(point p1, point p2, routingInst *rst){
         status = getIndex(segRU->p1, segRU->p2, rst, &edgeRU);
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-        for(int i = 0; i < (int)edgeRU.size(); ++i)
+        for(int i = 0; i < (int)edgeRU.size(); ++i){
+            printf("\tedgeRU[i]= %d",edgeRU[i]);
             segRU->edges.push_back(edgeRU[i]);
+        }
         edgeRU.clear();
         routeRU.segments.push_back(*segRU);
         delete segRU;
@@ -1304,8 +1310,10 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 status = getIndex(segComp->p1, segComp->p2, rst, &edgeComp);
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-                for(int j = 0; j < (int)edgeComp.size(); ++j)
+                for(int j = 0; j < (int)edgeComp.size(); ++j){
+                    printf("\tedgeComp[j]= %d",edgeComp[j]);
                     segComp->edges.push_back(edgeComp[j]);
+                }
                 edgeComp.clear();
                 routeComp.segments.push_back(*segComp);
                 delete segComp;
@@ -1320,8 +1328,10 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 status = getIndex(segComp->p1, segComp->p2, rst, &edgeComp);
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-                for(int j = 0; j < (int)edgeComp.size(); ++j)
+                for(int j = 0; j < (int)edgeComp.size(); ++j){
+                    printf("\tedgeComp[j]= %d",edgeComp[j]);
                     segComp->edges.push_back(edgeComp[j]);
+                }
                 edgeComp.clear();
                 routeComp.segments.push_back(*segComp);
                 delete segComp;
@@ -1336,8 +1346,10 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 status = getIndex(segComp->p1, segComp->p2, rst, &edgeComp);
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
-                for(int j = 0; j < (int)edgeComp.size(); ++j)
+                for(int j = 0; j < (int)edgeComp.size(); ++j){
+                    printf("\tedgeComp[j]= %d",edgeComp[j]);
                     segComp->edges.push_back(edgeComp[j]);
+                }
                 edgeComp.clear();
                 routeComp.segments.push_back(*segComp);
                 delete segComp;
