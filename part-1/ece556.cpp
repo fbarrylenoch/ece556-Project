@@ -1196,6 +1196,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
     
      // return empty route if same x values
     if (p1.x == p2.x){
+        printf("returning empty route\n");
         return routeRU;
     }
 
