@@ -370,7 +370,8 @@ int calcRouteCost(route *newRoute, routingInst *rst){
             return 0;
         // over all edges in the segment
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            printf("\tindices[j]= %d\n",indices[j]);
+            if(indices[j] < 0 || indices[j] >= rst->numEdges)
+                printf("\tindices[j]= %d\n",indices[j]);
             cost += rst->edgeWeight[indices[j]];
         }
         indices.clear();
@@ -495,12 +496,12 @@ int RRRnet(routingInst *rst, net *netRRR){
             routeBest = routeRZ;
             routeBest_weight = routeRZ_weight;
         }
-        if (routeU_weight < routeBest_weight) {
+        if ((routeU_weight < routeBest_weight) && routeU_weight > 0) {
             //printf("\tfor pins %d - %d, U is the best\n",i,i+1);
             routeBest = routeU;
             routeBest_weight = routeU_weight;
         }
-        if (routeRU_weight < routeBest_weight) {
+        if ((routeRU_weight < routeBest_weight) && routeRU_weight > 0) {
             //printf("\tfor pins %d - %d, RU is the best\n",i,i+1);
             routeBest = routeRU;
             routeBest_weight = routeRU_weight;
