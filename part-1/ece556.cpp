@@ -360,20 +360,25 @@ int calcEdgeWeights(route *newRoute, routingInst *rst){
 }
 
 int calcRouteCost(route *newRoute, routingInst *rst){
+    printf("Entered calcRouteCost\n");
     vector<int> indices;
     int cost, status;
     cost = 0;
     // over all segments in the route
     for(int i = 0; i < newRoute->numSegs; ++i){
         status = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst, &indices);
-        if(status==0)
+        if(status==0){
+            printf("\tgetIndex failed\n");
             return 0;
+        }
         // over all edges in the segment
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
+            printf("\trst->edgeWeight[indices[j]]= %d",rst->edgeWeight[indices[j]]);
             cost += rst->edgeWeight[indices[j]];
         }
         indices.clear();
     }
+    printf("Leaving calcRouteCost\n\n");
     return cost;
 }
 
@@ -468,15 +473,15 @@ int RRRnet(routingInst *rst, net *netRRR){
         // get weights of each route
         
         routeL_weight = calcRouteCost(&routeL, rst);
-        printf("\t\tcalculated routeL weight\n");
+        //printf("\t\tcalculated routeL weight\n");
         routeZ_weight = calcRouteCost(&routeZ, rst);
-        printf("\t\tcalculated routeZ weight\n");
+        //printf("\t\tcalculated routeZ weight\n");
         routeRZ_weight = calcRouteCost(&routeRZ, rst);
-        printf("\t\tcalculated routeRZ weight\n");
+        //printf("\t\tcalculated routeRZ weight\n");
         routeU_weight = calcRouteCost(&routeU, rst);
-        printf("\t\tcalculated routeU weight\n");
+        //printf("\t\tcalculated routeU weight\n");
         routeRU_weight = calcRouteCost(&routeRU, rst);
-        printf("\twe have calculated all weights for each route\n");
+        //printf("\twe have calculated all weights for each route\n");
         
         
         //compare weights and take lowest cost route
@@ -1186,7 +1191,7 @@ route shapeU(point p1, point p2, routingInst *rst){
 
 // returns the best Rotated U shape route
 route shapeRU(point p1, point p2, routingInst *rst){
-    printf("in RU with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
+    //printf("in RU with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
     vector<int> edgeRU;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
