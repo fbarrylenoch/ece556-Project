@@ -355,31 +355,15 @@ int calcEdgeWeights(route *newRoute, routingInst *rst){
 }
 
 int calcRouteCost(route *newRoute, routingInst *rst){
-    //printf("Entering calcRouteCost\n");
     vector<int> indices;
     int cost; //status;
     cost = 0;
     // over all segments in the route
     for(int i = 0; i < newRoute->numSegs; ++i){
-        //printf("\tEnter getIndex\n");
-        /*status = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst, &indices);
-        if(status==0)
-            return 0;
-        // over all edges in the segment
-        printf("size of indices: %d\tnumEdges: %d\n",indices.size(),newRoute->segments[i].numEdges);
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            if((indices[j] < 0) || (indices[j] >= rst->numEdges))
-                printf("\tindices[j]= %d\n",indices[j]);
-            cost += rst->edgeWeight[indices[j]];
-        }
-        indices.clear();*/
-        printf("numSegs: %d\tnumEdges: %d\n",newRoute->numSegs,newRoute->segments[i].numEdges);
-        for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            printf("\tcurrent Edge: %d\tfor segment: (%d,%d) - (%d,%d)\n",newRoute->segments[i].edges[j],newRoute->segments[i].p1.x,newRoute->segments[i].p1.y,newRoute->segments[i].p2.x,newRoute->segments[i].p2.y);
             cost += rst->edgeWeight[newRoute->segments[i].edges[j]];
-        }   
+        } 
     }
-    //printf("End calcRouteCost\n\n\n");
     return cost;
 }
 
@@ -479,9 +463,11 @@ int RRRnet(routingInst *rst, net *netRRR){
         //printf("\t\tcalculated routeZ weight\n");
         routeRZ_weight = calcRouteCost(&routeRZ, rst);
         //printf("\t\tcalculated routeRZ weight\n");
-        routeU_weight = calcRouteCost(&routeU, rst);
+        if(routeU.numSegs != 0)
+            routeU_weight = calcRouteCost(&routeU, rst);
         //printf("\t\tcalculated routeU weight\n");
-        routeRU_weight = calcRouteCost(&routeRU, rst);
+        if(routeRU.numSegs != 0)
+            routeRU_weight = calcRouteCost(&routeRU, rst);
         //printf("\twe have calculated all weights for each route\n");
         
         
@@ -499,12 +485,12 @@ int RRRnet(routingInst *rst, net *netRRR){
             routeBest = routeRZ;
             routeBest_weight = routeRZ_weight;
         }
-        if ((routeU_weight < routeBest_weight) && routeU_weight > 0) {
+        if ((routeU_weight < routeBest_weight) && (routeU.numSegs != 0)) {
             //printf("\tfor pins %d - %d, U is the best\n",i,i+1);
             routeBest = routeU;
             routeBest_weight = routeU_weight;
         }
-        if ((routeRU_weight < routeBest_weight) && routeRU_weight > 0) {
+        if ((routeRU_weight < routeBest_weight) && (routeRU.numSegs != 0) ){
             //printf("\tfor pins %d - %d, RU is the best\n",i,i+1);
             routeBest = routeRU;
             routeBest_weight = routeRU_weight;
@@ -1031,6 +1017,7 @@ route shapeU(point p1, point p2, routingInst *rst){
     
      // return empty route if same x values
     if (p1.x == p2.x){
+        routeU.numSegs = 0;
         return routeU;
     }
 
@@ -1117,7 +1104,7 @@ route shapeU(point p1, point p2, routingInst *rst){
         
         //check every other possible U route and compare weights
         if (bottomPoint.y - 2 >= 0) { // may have to be -1  
-            for (int i = 2; i <= bottomPoint.y; i++) {
+            for (int i = 2; (bottomPoint.y - i) >= 0; ++i) {
                 routeComp.numSegs = 0;
                 // create midpoints
                 leftMidPoint.x = leftPoint.x;
@@ -1208,6 +1195,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
      // return empty route if same x values
     if (p1.x == p2.x){
         //printf("returning empty route\n");
+        routeRU.numSegs = 0;
         return routeRU;
     }
 
@@ -1300,7 +1288,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
         
         //check every other possible RU route and compare weights
         if (topPoint.y <= (rst->gy - 2)) {
-            for (int i = 2; i <= (rst->gx - topPoint.y); i++) {
+            for (int i = 2; (i + topPoint.y) <= rst->gy; ++i) {
                 routeComp.numSegs = 0;
                 // create midpoints
                 leftMidPoint.x = leftPoint.x;
@@ -1373,7 +1361,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
             }
         }
         // return the route
-        //printf("leaving RU\n");
         return routeRU;
     }
 }
