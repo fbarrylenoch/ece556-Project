@@ -333,7 +333,7 @@ int RRR(routingInst *rst){
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
         printf("\tcurrent time %.2f\n", seconds);
-        if(seconds >= 360)
+        if(seconds >= 900)
             done = true;
     }
     return 1;
