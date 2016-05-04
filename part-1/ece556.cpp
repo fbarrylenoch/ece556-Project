@@ -159,22 +159,20 @@ int getIndex(point p1, point p2, routingInst *rst, std::vector<int>* indicies){
     if (p1.y == p2.y) {
         // calculate index in rst->edgeCaps
         if ((p1.x-p2.x) == -1) {
-            indicies->front() = (rst->gx-1)*p1.y + p1.x;
+            indicies->push_back((rst->gx-1)*p1.y + p1.x);
         }
         else if((p1.x-p2.x) < -1) {
             distance = abs(p1.x-p2.x);
-            indicies->front() = (rst->gx-1)*p1.y + p1.x;
-            for (int i=1; i < distance; ++i) {
+            for (int i=0; i < distance; ++i) {
                 indicies->push_back((rst->gx-1)*p1.y + p1.x + i);
             }
         }            
         else if((p1.x-p2.x) == 1) {
-            indicies->front() = (rst->gx-1)*p1.y + p2.x;
+            indicies->push_back((rst->gx-1)*p1.y + p2.x);
         }
         else {
             distance = abs(p1.x-p2.x);
-            indicies->front() = (rst->gx-1)*p1.y + p2.x;
-            for (int i=1; i < distance; ++i) {
+            for (int i=0; i < distance; ++i) {
                 indicies->push_back((rst->gx-1)*p1.y + p2.x + i);
             }
         } // case where p1.x-p2.x > 1
@@ -183,21 +181,19 @@ int getIndex(point p1, point p2, routingInst *rst, std::vector<int>* indicies){
     else if(p1.x == p2.x){
         // calculate index in rst->edgeCaps
         if ((p1.y-p2.y) == -1) {
-            indicies->front() = (rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x;
+            indicies->push_back((rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x);
         }
         else if ((p1.y-p2.y) < -1) {
             distance = abs(p1.y-p2.y);
-            indicies->front() = (rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x;
-            for (int i=1; i < distance; i++)
+            for (int i=0; i < distance; i++)
                 indicies->push_back((rst->gy)*(rst->gx-1) + rst->gx*(p1.y + i) + p1.x);
         }
         else if ((p1.y-p2.y) == 1) {
-            indicies->front() = (rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x;
+            indicies->push_back((rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x);
         }
         else {
             distance = abs(p1.y-p2.y);
-            indicies->front() = (rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x;
-            for (int i=1; i < distance; i++) {
+            for (int i=0; i < distance; i++) {
                 indicies->push_back((rst->gy)*(rst->gx-1) + rst->gx*(p2.y + i) + p1.x);
             }
         } // case where p1.y-p2.y > 1
@@ -361,7 +357,7 @@ int calcEdgeWeights(route *newRoute, routingInst *rst){
 int calcRouteCost(route *newRoute, routingInst *rst){
     //printf("Entering calcRouteCost\n");
     vector<int> indices;
-    int cost, status;
+    int cost; //status;
     cost = 0;
     // over all segments in the route
     for(int i = 0; i < newRoute->numSegs; ++i){
@@ -377,9 +373,9 @@ int calcRouteCost(route *newRoute, routingInst *rst){
             cost += rst->edgeWeight[indices[j]];
         }
         indices.clear();*/
-        //printf("numSegs: %d\tnumEdges: %d\n",newRoute->numSegs,newRoute->segments[i].numEdges);
+        printf("numSegs: %d\tnumEdges: %d\n",newRoute->numSegs,newRoute->segments[i].numEdges);
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            printf("current Edge: %d\tfor segment: (%d,%d) - (%d,%d)\n\t",newRoute->segments[i].edges[j],newRoute->segments[i].p1.x,newRoute->segments[i].p1.y,newRoute->segments[i].p2.x,newRoute->segments[i].p2.y);
+            printf("\tcurrent Edge: %d\tfor segment: (%d,%d) - (%d,%d)\n",newRoute->segments[i].edges[j],newRoute->segments[i].p1.x,newRoute->segments[i].p1.y,newRoute->segments[i].p2.x,newRoute->segments[i].p2.y);
             cost += rst->edgeWeight[newRoute->segments[i].edges[j]];
         }   
     }
