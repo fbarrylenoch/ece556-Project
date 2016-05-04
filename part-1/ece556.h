@@ -16,6 +16,7 @@ using std::min;
 #include <unistd.h>
 #include <vector>
 using std::vector;
+#include <limits.h>
 
 #include <fstream>
 using std::ifstream;

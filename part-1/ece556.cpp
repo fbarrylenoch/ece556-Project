@@ -205,10 +205,6 @@ int getIndex(point p1, point p2, routingInst *rst, std::vector<int>* indicies){
 int printRoutingInstince (routingInst *rst){
     for(int i = 0; i < rst->numNets; ++i){
         printf("net n%d, has %d pins\n", i, rst->nets.at(i).numPins);
-       /* printf("the pin connections are:\n");
-        for(int j = 0; j < rst->nets.at(i).numPins; ++j){
-            printf("\t(%d,%d)\n", rst->nets.at(i).pins[j].x,rst->nets.at(i).pins[j].y);
-        }*/
     }
     return 1;
 }
@@ -321,13 +317,11 @@ int RRR(routingInst *rst){
     time(&init_time);
     while(!done){
         calcNetCost(rst);
-        printf("sending net n%d", rst->nets[0].id);
         status = RRRnet(rst, &rst->nets[0]);
 		if(status==0)
 			return 0;
         time(&curr_time);
         seconds = difftime(curr_time, init_time);
-        printf("\tcurrent time %.2f\n", seconds);
         if(seconds >= 900)
             done = true;
     }
@@ -397,7 +391,6 @@ int RRRnet(routingInst *rst, net *netRRR){
     int status;
     vector<int> indices;
     route routeRRR;
-    //printf("\twe're in RRR for net n%d\n", netRRR->id);
     
     // routes for each shape attempt
     route routeBest;
@@ -427,7 +420,6 @@ int RRRnet(routingInst *rst, net *netRRR){
             rst->edgeUtils[indices.at(j)]--;
         indices.clear();
     }
-    //printf("\twe have ripped up the current route\n");
 
     // call edgeWeight
     calcEdgeWeights(&routeRRR,rst);
@@ -441,7 +433,6 @@ int RRRnet(routingInst *rst, net *netRRR){
     // reroute
     // loop for all pins
     for (int i = 0; i < (netRRR->numPins-1); i++) {
-        //printf("\tchecking best route for pin%d to %d\n", i, (i+1));
         // try L shape
         routeL = shapeL(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try Z shape 
@@ -452,56 +443,45 @@ int RRRnet(routingInst *rst, net *netRRR){
         routeU = shapeU(netRRR->pins[i],netRRR->pins[i+1],rst);
         // try Rotated U shape
         routeRU = shapeRU(netRRR->pins[i],netRRR->pins[i+1],rst);
-        //printf("\twe have all of the candidate routes\n");
         
         
         // get weights of each route
         
         routeL_weight = calcRouteCost(&routeL, rst);
-        //printf("\t\tcalculated routeL weight\n");
         routeZ_weight = calcRouteCost(&routeZ, rst);
-        //printf("\t\tcalculated routeZ weight\n");
         routeRZ_weight = calcRouteCost(&routeRZ, rst);
-        //printf("\t\tcalculated routeRZ weight\n");
+        routeU_weight = INT_MAX;
         if(routeU.numSegs != 0)
             routeU_weight = calcRouteCost(&routeU, rst);
-        //printf("\t\tcalculated routeU weight\n");
+        routeRU_weight = INT_MAX;
         if(routeRU.numSegs != 0)
             routeRU_weight = calcRouteCost(&routeRU, rst);
-        //printf("\twe have calculated all weights for each route\n");
         
         
         //compare weights and take lowest cost route
         routeBest = routeL;
         routeBest_weight = routeL_weight;
-        //printf("\tfor pins %d - %d, L is the best\n",i,i+1);
         if (routeZ_weight < routeBest_weight) {
-            //printf("\tfor pins %d - %d, Z is the best\n",i,i+1);
             routeBest = routeZ;
             routeBest_weight = routeZ_weight;
         }
         if (routeRZ_weight < routeBest_weight) {
-            //printf("\tfor pins %d - %d, RZ is the best\n",i,i+1);
             routeBest = routeRZ;
             routeBest_weight = routeRZ_weight;
         }
         if ((routeU_weight < routeBest_weight) && (routeU.numSegs != 0)) {
-            //printf("\tfor pins %d - %d, U is the best\n",i,i+1);
             routeBest = routeU;
             routeBest_weight = routeU_weight;
         }
         if ((routeRU_weight < routeBest_weight) && (routeRU.numSegs != 0) ){
-            //printf("\tfor pins %d - %d, RU is the best\n",i,i+1);
             routeBest = routeRU;
             routeBest_weight = routeRU_weight;
         }
         // add to routeRRR_segments
-        //printf("\twe have chosen the best route of them all\n");
 
         for (int j = 0; j < routeBest.numSegs; ++j)
             routeRRR.segments.push_back(routeBest.segments[j]);
         routeRRR.numSegs += routeBest.numSegs;
-        //printf("\twe have added the best route to the route\n");
         
         // delete each route
         for(int j = 0; j < routeL.numSegs; ++j)
@@ -562,7 +542,6 @@ route shapeL(point p1, point p2, routingInst *rst){
         delete segL;
     }
     else{
-        //printf("\t\tThe two points are an L shape\n");
         // assign L shape route  
         if (p1.y < p2.y) {
             topP = p2;
@@ -1043,6 +1022,7 @@ route shapeU(point p1, point p2, routingInst *rst){
 
     // return empty route if bottomPoint.y == 0
     if (bottomPoint.y == 0) {
+        routeU.numSegs = 0;
         return routeU;
     }
     else {
@@ -1179,7 +1159,6 @@ route shapeU(point p1, point p2, routingInst *rst){
 
 // returns the best Rotated U shape route
 route shapeRU(point p1, point p2, routingInst *rst){
-    //printf("in RU with p1: (%d,%d) and p2: (%d,%d)\n",p1.x,p1.y,p2.x,p2.y);
     vector<int> edgeRU;
     vector<int> edgeComp;
     route routeComp; // used to compare different variations of each route shape  
@@ -1194,7 +1173,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
     
      // return empty route if same x values
     if (p1.x == p2.x){
-        //printf("returning empty route\n");
         routeRU.numSegs = 0;
         return routeRU;
     }
@@ -1221,6 +1199,7 @@ route shapeRU(point p1, point p2, routingInst *rst){
 
     // return empty route if topPoint.y == (rst->gy - 1)
     if (topPoint.y == (rst->gy - 1)) { // may have to be -1  
+        routeRU.numSegs = 0;
         return routeRU;
     }
     else {
@@ -1243,7 +1222,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
         for(int i = 0; i < (int)edgeRU.size(); ++i){
-            //printf("\tedgeRU[i]= %d\n",edgeRU[i]);
             segRU->edges.push_back(edgeRU[i]);
         }
         edgeRU.clear();
@@ -1261,7 +1239,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
         for(int i = 0; i < (int)edgeRU.size(); ++i){
-            //printf("\tedgeRU[i]= %d\n",edgeRU[i]);
             segRU->edges.push_back(edgeRU[i]);
         }
         edgeRU.clear();
@@ -1279,7 +1256,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
         if(status==0)
             fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
         for(int i = 0; i < (int)edgeRU.size(); ++i){
-            //printf("\tedgeRU[i]= %d\n",edgeRU[i]);
             segRU->edges.push_back(edgeRU[i]);
         }
         edgeRU.clear();
@@ -1307,7 +1283,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
                 for(int j = 0; j < (int)edgeComp.size(); ++j){
-                    //printf("\tedgeComp[j]= %d\n",edgeComp[j]);
                     segComp->edges.push_back(edgeComp[j]);
                 }
                 edgeComp.clear();
@@ -1325,7 +1300,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
                 for(int j = 0; j < (int)edgeComp.size(); ++j){
-                    //printf("\tedgeComp[j]= %d\n",edgeComp[j]);
                     segComp->edges.push_back(edgeComp[j]);
                 }
                 edgeComp.clear();
@@ -1343,7 +1317,6 @@ route shapeRU(point p1, point p2, routingInst *rst){
                 if(status==0)
                     fprintf(stderr, "\n\t==>\twe got an error from getIndex\n");
                 for(int j = 0; j < (int)edgeComp.size(); ++j){
-                    //printf("\tedgeComp[j]= %d\n",edgeComp[j]);
                     segComp->edges.push_back(edgeComp[j]);
                 }
                 edgeComp.clear();
