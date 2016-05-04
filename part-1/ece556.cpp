@@ -154,7 +154,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
 
 int getIndex(point p1, point p2, routingInst *rst, std::vector<int>* indicies){
     int distance;
-    indicies->push_back(-1);
+    //indicies->push_back(-1);
     // check if horizontal line
     if (p1.y == p2.y) {
         // calculate index in rst->edgeCaps
@@ -188,7 +188,7 @@ int getIndex(point p1, point p2, routingInst *rst, std::vector<int>* indicies){
         else if ((p1.y-p2.y) < -1) {
             distance = abs(p1.y-p2.y);
             indicies->front() = (rst->gy)*(rst->gx-1) + rst->gx*p1.y + p1.x;
-            for (int i=0; i < distance; i++)
+            for (int i=1; i < distance; i++)
                 indicies->push_back((rst->gy)*(rst->gx-1) + rst->gx*(p1.y + i) + p1.x);
         }
         else if ((p1.y-p2.y) == 1) {
@@ -197,13 +197,12 @@ int getIndex(point p1, point p2, routingInst *rst, std::vector<int>* indicies){
         else {
             distance = abs(p1.y-p2.y);
             indicies->front() = (rst->gy)*(rst->gx-1) + rst->gx*p2.y + p1.x;
-            for (int i=0; i < distance; i++) {
+            for (int i=1; i < distance; i++) {
                 indicies->push_back((rst->gy)*(rst->gx-1) + rst->gx*(p2.y + i) + p1.x);
             }
         } // case where p1.y-p2.y > 1
     }
-    if(indicies->front() == -1)
-        return 0;
+    else{ return 0; }
     return 1;
 }
 
@@ -360,25 +359,31 @@ int calcEdgeWeights(route *newRoute, routingInst *rst){
 }
 
 int calcRouteCost(route *newRoute, routingInst *rst){
-    printf("Entering calcRouteCost\n");
+    //printf("Entering calcRouteCost\n");
     vector<int> indices;
     int cost, status;
     cost = 0;
     // over all segments in the route
     for(int i = 0; i < newRoute->numSegs; ++i){
-        printf("\tEnter getIndex\n");
-        status = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst, &indices);
+        //printf("\tEnter getIndex\n");
+        /*status = getIndex(newRoute->segments[i].p1, newRoute->segments[i].p2, rst, &indices);
         if(status==0)
             return 0;
         // over all edges in the segment
+        printf("size of indices: %d\tnumEdges: %d\n",indices.size(),newRoute->segments[i].numEdges);
         for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
-            if(indices[j] < 0 || indices[j] >= rst->numEdges)
+            if((indices[j] < 0) || (indices[j] >= rst->numEdges))
                 printf("\tindices[j]= %d\n",indices[j]);
             cost += rst->edgeWeight[indices[j]];
         }
-        indices.clear();
+        indices.clear();*/
+        //printf("numSegs: %d\tnumEdges: %d\n",newRoute->numSegs,newRoute->segments[i].numEdges);
+        for(int j = 0; j < newRoute->segments[i].numEdges; ++j){
+            printf("current Edge: %d\tfor segment: (%d,%d) - (%d,%d)\n\t",newRoute->segments[i].edges[j],newRoute->segments[i].p1.x,newRoute->segments[i].p1.y,newRoute->segments[i].p2.x,newRoute->segments[i].p2.y);
+            cost += rst->edgeWeight[newRoute->segments[i].edges[j]];
+        }   
     }
-    printf("End calcRouteCost\n\n\n");
+    //printf("End calcRouteCost\n\n\n");
     return cost;
 }
 
